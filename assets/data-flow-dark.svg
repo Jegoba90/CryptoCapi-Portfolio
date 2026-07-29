@@ -1,0 +1,212 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 628" width="1160" height="628" role="img" aria-labelledby="ttl desc" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+  <title id="ttl">CryptoCapi · Flujo de Datos</title>
+  <desc id="desc">Tres pipelines independientes en Python. Motor Radar consume noticias Tier 1 y precios, y es el único que invoca un LLM (con override determinista posterior). Motor Quant PRO consume velas de Binance y Motor Quant Plus lee la blockchain por RPC; ambos son 100% deterministas, sin LLM. Radar y Quant Plus empujan sus resultados a la API Express; a Quant PRO lo consulta la API on-demand. La API es la única que persiste en PostgreSQL serverless, cachea en Redis y sirve al frontend.</desc>
+
+  <defs>
+    <marker id="aRadar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M1,1.2 L7,4 L1,6.8 Z" fill="#a78bfa"/>
+    </marker>
+    <marker id="aPro" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M1,1.2 L7,4 L1,6.8 Z" fill="#34d399"/>
+    </marker>
+    <marker id="aProRev" viewBox="0 0 8 8" refX="1" refY="4" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M7,1.2 L1,4 L7,6.8 Z" fill="#34d399"/>
+    </marker>
+    <marker id="aPlus" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M1,1.2 L7,4 L1,6.8 Z" fill="#22d3ee"/>
+    </marker>
+    <marker id="aNeu" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M1,1.2 L7,4 L1,6.8 Z" fill="#5a5a6e"/>
+    </marker>
+    <marker id="aNeuRev" viewBox="0 0 8 8" refX="1" refY="4" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M7,1.2 L1,4 L7,6.8 Z" fill="#5a5a6e"/>
+    </marker>
+  </defs>
+
+  <rect x="0.5" y="0.5" width="1159" height="627" rx="16" fill="#0d0d12" stroke="#22222c" stroke-width="1"/>
+
+  <!-- etiquetas de carril en cajas -->
+  <g>
+    <g fill="#1c1c25" stroke="#2f2f3b" stroke-width="1">
+      <rect x="79" y="24" width="78" height="20" rx="6"/>
+      <rect x="333" y="24" width="142" height="20" rx="6"/>
+      <rect x="644" y="24" width="128" height="20" rx="6"/>
+      <rect x="840" y="24" width="110" height="20" rx="6"/>
+      <rect x="1028" y="24" width="74" height="20" rx="6"/>
+    </g>
+    <g font-size="10" font-weight="600" letter-spacing="1" fill="#9a9aae" text-anchor="middle">
+      <text x="118" y="38">FUENTES</text>
+      <text x="404" y="38">MOTORES · PYTHON</text>
+      <text x="708" y="38">API · TYPESCRIPT</text>
+      <text x="895" y="38">PERSISTENCIA</text>
+      <text x="1065" y="38">CLIENTE</text>
+    </g>
+  </g>
+
+  <!-- conexiones -->
+  <g fill="none" stroke-width="1.8" stroke-linecap="round">
+    <!-- fuentes hacia cada motor -->
+    <path d="M209,159 H243" stroke="#a78bfa" marker-end="url(#aRadar)"/>
+    <path d="M209,333 H243" stroke="#34d399" marker-end="url(#aPro)"/>
+    <path d="M209,507 H243" stroke="#22d3ee" marker-end="url(#aPlus)"/>
+    <!-- motores hacia la API: Radar y Plus empujan, a PRO lo consulta la API -->
+    <path d="M565,159 H629" stroke="#a78bfa" marker-end="url(#aRadar)"/>
+    <path d="M565,333 H629" stroke="#34d399" marker-end="url(#aPro)" marker-start="url(#aProRev)"/>
+    <path d="M565,507 H629" stroke="#22d3ee" marker-end="url(#aPlus)"/>
+    <!-- la API es la unica que persiste y cachea -->
+    <path d="M787,193 H817" stroke="#5a5a6e" marker-end="url(#aNeu)" marker-start="url(#aNeuRev)"/>
+    <path d="M787,473 H817" stroke="#5a5a6e" marker-end="url(#aNeu)" marker-start="url(#aNeuRev)"/>
+    <!-- API hacia el cliente: pasa entre los dos almacenes -->
+    <path d="M787,333 H997" stroke="#5a5a6e" marker-end="url(#aNeu)"/>
+  </g>
+  <g font-size="9.5" fill="#8e8ea3" text-anchor="middle">
+    <text x="597" y="150">push</text>
+    <text x="597" y="324">on-demand</text>
+    <text x="597" y="498">push</text>
+  </g>
+
+  <!-- FUENTES: una por motor -->
+  <g>
+    <rect x="30" y="116" width="176" height="86" rx="10" fill="#15151c" stroke="#a78bfa" stroke-opacity="0.22" stroke-width="1"/>
+    <text x="46" y="145" font-size="13" font-weight="600" fill="#e9e9f2">Noticias + precios</text>
+    <g font-size="10.5" fill="#8e8ea3">
+      <text x="46" y="164">Bloomberg · Reuters</text>
+      <text x="46" y="181">Yahoo · CoinGecko</text>
+    </g>
+  </g>
+  <g>
+    <rect x="30" y="290" width="176" height="86" rx="10" fill="#15151c" stroke="#34d399" stroke-opacity="0.22" stroke-width="1"/>
+    <text x="46" y="327" font-size="13" font-weight="600" fill="#e9e9f2">Binance REST</text>
+    <text x="46" y="346" font-size="10.5" fill="#8e8ea3">Velas 1D · 4H</text>
+  </g>
+  <g>
+    <rect x="30" y="464" width="176" height="86" rx="10" fill="#15151c" stroke="#22d3ee" stroke-opacity="0.22" stroke-width="1"/>
+    <text x="46" y="493" font-size="13" font-weight="600" fill="#e9e9f2">On-chain + precios</text>
+    <g font-size="10.5" fill="#8e8ea3">
+      <text x="46" y="512">Alchemy · Mempool.space</text>
+      <text x="46" y="529">Yahoo · CoinGecko</text>
+    </g>
+  </g>
+
+  <!-- MOTOR RADAR: el unico con LLM -->
+  <g>
+    <rect x="246" y="100" width="316" height="118" rx="12" fill="#15151c"/>
+    <rect x="246" y="100" width="316" height="118" rx="12" fill="#a78bfa" fill-opacity="0.07" stroke="#a78bfa" stroke-opacity="0.42" stroke-width="1"/>
+    <rect x="262" y="119" width="34" height="34" rx="9" fill="#a78bfa" fill-opacity="0.14" stroke="#a78bfa" stroke-opacity="0.3" stroke-width="1"/>
+    <g transform="translate(268 125) scale(0.916667)" fill="none" stroke="#a78bfa" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6.5,20.2 H14.5"/>
+      <path d="M11,15 L10.6,20.2"/>
+      <ellipse cx="11.6" cy="10.2" rx="7.6" ry="4.3" transform="rotate(-38 11.6 10.2)" fill="#a78bfa" fill-opacity="0.18"/>
+      <path d="M12.6,9 L16.4,6.2"/>
+      <circle cx="17" cy="5.7" r="1.25"/>
+    </g>
+    <text x="308" y="143" font-size="19" font-weight="600" fill="#e9e9f2">Motor Radar</text>
+    <text x="308" y="166" font-size="12" fill="#8e8ea3">Z-Score · Bollinger · sentimiento</text>
+    <rect x="308" y="178" width="134" height="20" rx="6" fill="#a78bfa" fill-opacity="0.12" stroke="#a78bfa" stroke-opacity="0.3" stroke-width="1"/>
+    <text x="375" y="192" font-size="10.5" text-anchor="middle" fill="#a78bfa">LLM + override Python</text>
+    <rect x="450" y="178" width="88" height="20" rx="6" fill="none" stroke="#2a2a35" stroke-width="1"/>
+    <text x="494" y="192" font-size="10" text-anchor="middle" fill="#8e8ea3" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">process_seal</text>
+  </g>
+
+  <!-- MOTOR QUANT PRO: determinista -->
+  <g>
+    <rect x="246" y="274" width="316" height="118" rx="12" fill="#15151c"/>
+    <rect x="246" y="274" width="316" height="118" rx="12" fill="#34d399" fill-opacity="0.07" stroke="#34d399" stroke-opacity="0.42" stroke-width="1"/>
+    <rect x="262" y="293" width="34" height="34" rx="9" fill="#34d399" fill-opacity="0.14" stroke="#34d399" stroke-opacity="0.3" stroke-width="1"/>
+    <g transform="translate(268 299) scale(0.916667)" fill="none" stroke="#34d399" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="6.2" y="6.2" width="11.6" height="11.6" rx="2.2"/>
+      <rect x="9.8" y="9.8" width="4.4" height="4.4" rx="1" fill="#34d399" fill-opacity="0.85" stroke="none"/>
+      <path d="M9.4,6.2 V3.2"/>
+      <path d="M12,6.2 V3.2"/>
+      <path d="M14.6,6.2 V3.2"/>
+      <path d="M9.4,17.8 V20.8"/>
+      <path d="M12,17.8 V20.8"/>
+      <path d="M14.6,17.8 V20.8"/>
+      <path d="M6.2,9.4 H3.2"/>
+      <path d="M6.2,12 H3.2"/>
+      <path d="M6.2,14.6 H3.2"/>
+      <path d="M17.8,9.4 H20.8"/>
+      <path d="M17.8,12 H20.8"/>
+      <path d="M17.8,14.6 H20.8"/>
+    </g>
+    <text x="308" y="317" font-size="19" font-weight="600" fill="#e9e9f2">Motor Quant PRO</text>
+    <text x="308" y="340" font-size="12" fill="#8e8ea3">Kalman · Lyapunov · MIR 1D/4H</text>
+    <rect x="308" y="352" width="112" height="20" rx="6" fill="#34d399" fill-opacity="0.12" stroke="#34d399" stroke-opacity="0.3" stroke-width="1"/>
+    <text x="364" y="366" font-size="10.5" text-anchor="middle" fill="#34d399">100% determinista</text>
+    <rect x="428" y="352" width="82" height="20" rx="6" fill="none" stroke="#2a2a35" stroke-width="1"/>
+    <text x="469" y="366" font-size="10" text-anchor="middle" fill="#8e8ea3" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">output_seal</text>
+  </g>
+
+  <!-- MOTOR QUANT PLUS: determinista -->
+  <g>
+    <rect x="246" y="448" width="316" height="118" rx="12" fill="#15151c"/>
+    <rect x="246" y="448" width="316" height="118" rx="12" fill="#22d3ee" fill-opacity="0.07" stroke="#22d3ee" stroke-opacity="0.42" stroke-width="1"/>
+    <rect x="262" y="467" width="34" height="34" rx="9" fill="#22d3ee" fill-opacity="0.14" stroke="#22d3ee" stroke-opacity="0.3" stroke-width="1"/>
+    <g transform="translate(268 473) scale(0.916667)" fill="none" stroke="#22d3ee" stroke-width="1.9" stroke-linecap="butt" stroke-linejoin="miter">
+      <path d="M2.4,17 V7.4 H8.8 V17 H15.2 V7.4 H21.6"/>
+    </g>
+    <text x="308" y="491" font-size="19" font-weight="600" fill="#e9e9f2">Motor Quant Plus</text>
+    <text x="308" y="514" font-size="12" fill="#8e8ea3">Z-Score t-Student · on-chain</text>
+    <rect x="308" y="526" width="112" height="20" rx="6" fill="#22d3ee" fill-opacity="0.12" stroke="#22d3ee" stroke-opacity="0.3" stroke-width="1"/>
+    <text x="364" y="540" font-size="10.5" text-anchor="middle" fill="#22d3ee">100% determinista</text>
+    <rect x="428" y="526" width="88" height="20" rx="6" fill="none" stroke="#2a2a35" stroke-width="1"/>
+    <text x="472" y="540" font-size="10" text-anchor="middle" fill="#8e8ea3" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">reproducible</text>
+  </g>
+
+  <!-- API EXPRESS: unico punto de persistencia y salida -->
+  <g>
+    <rect x="632" y="120" width="152" height="426" rx="12" fill="#15151c" stroke="#3a3a48" stroke-width="1"/>
+    <g transform="translate(695 281) scale(1.083333)" fill="none" stroke="#a0a0b4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="7.4"/>
+      <circle cx="12" cy="12" r="2.9"/>
+      <g stroke-width="1.9">
+        <path d="M19.4,12 H22.6"/>
+        <path d="M17.23,17.23 L19.5,19.5"/>
+        <path d="M12,19.4 V22.6"/>
+        <path d="M6.77,17.23 L4.5,19.5"/>
+        <path d="M4.6,12 H1.4"/>
+        <path d="M6.77,6.77 L4.5,4.5"/>
+        <path d="M12,4.6 V1.4"/>
+        <path d="M17.23,6.77 L19.5,4.5"/>
+      </g>
+    </g>
+    <text x="708" y="333" font-size="19" font-weight="600" text-anchor="middle" fill="#e9e9f2">API Express</text>
+    <text x="708" y="353" font-size="12" text-anchor="middle" fill="#8e8ea3">API keys · rate limit</text>
+    <text x="708" y="371" font-size="10.5" text-anchor="middle" fill="#5f5f6d">Zod end-to-end</text>
+  </g>
+
+  <!-- POSTGRESQL -->
+  <g>
+    <path d="M820,138 A75,14 0 0 1 970,138 L970,248 A75,14 0 0 1 820,248 Z" fill="#15151c" stroke="#2a2a35" stroke-width="1"/>
+    <ellipse cx="895" cy="138" rx="75" ry="14" fill="#1f1f29" stroke="#2a2a35" stroke-width="1"/>
+    <text x="895" y="191" text-anchor="middle" font-size="16" font-weight="600" fill="#e9e9f2">PostgreSQL</text>
+    <text x="895" y="210" text-anchor="middle" font-size="11.5" fill="#8e8ea3">Serverless</text>
+  </g>
+
+  <!-- REDIS -->
+  <g>
+    <path d="M820,418 A75,14 0 0 1 970,418 L970,528 A75,14 0 0 1 820,528 Z" fill="#15151c" stroke="#2a2a35" stroke-width="1"/>
+    <ellipse cx="895" cy="418" rx="75" ry="14" fill="#1f1f29" stroke="#2a2a35" stroke-width="1"/>
+    <text x="895" y="471" text-anchor="middle" font-size="16" font-weight="600" fill="#e9e9f2">Redis</text>
+    <text x="895" y="490" text-anchor="middle" font-size="11.5" fill="#8e8ea3">Cache TTL</text>
+  </g>
+
+  <!-- FRONTEND -->
+  <g>
+    <rect x="1000" y="281" width="130" height="104" rx="12" fill="#15151c" stroke="#2a2a35" stroke-width="1"/>
+    <g transform="translate(1052 300) scale(1.083333)" fill="none" stroke="#a0a0b4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4.6" width="18" height="14.8" rx="2.2"/>
+      <path d="M3,9.2 H21"/>
+      <circle cx="5.9" cy="6.9" r="0.85" fill="#a0a0b4" stroke="none"/>
+      <circle cx="8.5" cy="6.9" r="0.85" fill="#a0a0b4" stroke="none"/>
+      <circle cx="11.1" cy="6.9" r="0.85" fill="#a0a0b4" stroke="none"/>
+    </g>
+    <text x="1065" y="348" font-size="18" font-weight="600" text-anchor="middle" fill="#e9e9f2">Frontend</text>
+    <text x="1065" y="367" font-size="11" text-anchor="middle" fill="#8e8ea3">Vite + Tailwind</text>
+  </g>
+  <!-- firma de marca -->
+  <g>
+    <image x="1021" y="572" width="30" height="29.4" opacity="0.95" href="data:image/png;base64,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"/>
+    <text x="1130" y="592" font-size="13" font-weight="600" letter-spacing="0.2" text-anchor="end" fill="#c8c8d6">CryptoCapi</text>
+  </g>
+</svg>

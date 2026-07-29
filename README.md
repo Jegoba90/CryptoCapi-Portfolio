@@ -177,21 +177,14 @@ curl -H "x-api-key: demo_btc_eth_public" \
 
 ## 🔄 Flujo de Datos
 
-```mermaid
-flowchart LR
-    A["🌐 Fuentes<br/>Bloomberg · Reuters · CoinGecko · Binance · Mempool RPC"] --> B["📡 Motor Radar<br/>Python + LLM engine"]
-    A --> C["📊 Motor Quant PRO<br/>Kalman · Lyapunov · MIR"]
-    A --> D["📈 Motor Quant Plus<br/>Z-Score · t-Student · On-chain RPC"]
-    B --> E[("🗄️ PostgreSQL<br/>Serverless")]
-    C --> E
-    D --> E
-    B --> F[("⚡ Redis<br/>Managed")]
-    C --> F
-    D --> F
-    E --> G{"⚙️ API Express<br/>TypeScript"}
-    F --> G
-    G --> H["🎨 Frontend<br/>Vite + Tailwind"]
-```
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/data-flow-dark.svg">
+  <img src="assets/data-flow-light.svg" alt="Flujo de datos de CryptoCapi: tres pipelines independientes en Python. Radar consume noticias Tier 1 y precios, y es el único motor que invoca un LLM, con override determinista posterior. Quant PRO consume velas de Binance y Quant Plus lee la blockchain por RPC; ambos son 100% deterministas. Radar y Quant Plus empujan sus resultados a la API Express, mientras que a Quant PRO lo consulta la API on-demand. La API es la única que persiste en PostgreSQL, cachea en Redis y sirve al frontend." width="100%">
+</picture>
+
+</div>
 
 ---
 
