@@ -417,10 +417,18 @@ El API está pensado para que lo consuma una máquina, no solo una persona. Un a
 
 <div align="center">
 
-## 💡 Filosofía
+## 💜 Filosofía
 
 > ### *"Nosotros no te decimos qué comprar.*
 > ### *Te damos la matemática pura para que tú decidas."*
+
+<br/>
+
+### Hecho con 💜 y matemática pura
+
+**por el equipo de CryptoCapi**
+
+Detrás de cada Z-Score hay gente que cree que los números no deberían mentirle a nadie.
 
 <br/>
 
@@ -428,10 +436,15 @@ El API está pensado para que lo consuma una máquina, no solo una persona. Un a
 
 <br/>
 
-![Hecho con](https://img.shields.io/badge/hecho_con-matemática_pura-blueviolet?style=for-the-badge)
+![Hecho con](https://img.shields.io/badge/hecho_con-corazón_y_matemática_pura-blueviolet?style=for-the-badge)
 
 <br/>
 
-<a href="https://cryptocapi.com"><img src="assets/banner.png" alt="CryptoCapi — Capibara" width="100%"/></a>
+<a href="https://cryptocapi.com">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-white.png">
+    <img src="assets/logo-navy.png" alt="CryptoCapi" width="72"/>
+  </picture>
+</a>
 
 </div>
