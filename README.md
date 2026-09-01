@@ -342,21 +342,24 @@ Conoce la distribución detallada de archivos y carpetas de cada módulo en el m
 </details>
 
 <details>
-<summary>⛓️ Motor Quant Plus — Datos on-chain</summary>
+<summary>⛓️ Motor Quant Plus — Sello reproducible y datos on-chain</summary>
+
+Este es el motor cuyo sello **podés recalcular vos**. El vector de entrada abajo viene abreviado para que se lea; la respuesta completa, con sus 51 precios y sus 51 marcas de tiempo, está commiteada en [`api/examples/quant-plus-signal.json`](api/examples/quant-plus-signal.json), y **ese archivo verifica**: seguí los pasos de [docs/SEAL.md](docs/SEAL.md) y vas a obtener el mismo hash.
 
 ```json
 {
   "status": "success",
   "version": "1.0.0",
-  "timestamp": "2026-05-25T20:17:29.969Z",
+  "timestamp": "2026-09-01T15:03:57.044Z",
   "data": {
     "engine_used": "quant_plus",
     "asset": { "id": "bitcoin", "symbol": "BTC" },
-    "summary": "Equilibrio técnico.",
-    "sentiment": "neutral",
+    "generated_at": "2026-09-01T15:03:57.044Z",
+    "summary": "Lateralización en bandas normales, con leve presión bajista. Z-Score -0.67, al 19% de su umbral de anomalía (3.51).",
+    "sentiment": "bearish",
     "statistical_anomaly_detected": false,
     "confidence": {
-      "score": 0.61,
+      "score": 0.64,
       "label": "MEDIUM"
     },
     "onchain_stats": {
@@ -370,13 +373,30 @@ Conoce la distribución detallada de archivos y carpetas de cada módulo en el m
       "risk_level": "LOW"
     },
     "math_diagnostics": {
-      "z_score": 0.1705,
-      "bollinger_bandwidth": 0.0988,
+      "z_score": -0.6651,
+      "z_score_threshold": 3.5051,
+      "bollinger_bandwidth": 0.3667,
       "market_regime": "RANGING_CHOP",
       "extreme_volatility_detected": false,
       "data_quality": "OPTIMAL",
       "sentiment_override": false,
-      "anomaly_details": null
+      "anomaly_details": null,
+      "audit_trail": {
+        "protocol_hash": "0x821ba8b9ed9ecc1cca1b16c1d6feb902a7614cb027f2132a1b46d74e3fe3540a",
+        "calculated_at": "2026-09-01T15:03:56.979793Z",
+        "seal_type": "reproducible",
+        "algorithm_id": "SMA-20 / 2σ / 50-period Z-Score (Returns)",
+        "engine_version": "v2.2.0-math",
+        "data_source": {
+          "vendor": "Yahoo Finance (51 daily closes)",
+          "symbol": "BTCUSDT",
+          "timeframe": "1d (50-period log_returns Z-Score)"
+        },
+        "input_timestamps": ["2026-07-13T00:00:00Z", "…", "2026-09-01T00:00:00Z"],
+        "input_vector": [62239.1211, "…", 77860.8281],
+        "zscore_window_size": 49,
+        "daily_change_pct": -0.5919
+      }
     },
     "analysis": {
       "detailed_report": "Régimen de mercado: lateralización. Precio opera en el tercio inferior de las bandas de Bollinger. Z-Score (0.17) en zona neutral — sin anomalías estadísticas."
@@ -401,10 +421,45 @@ Conoce la distribución detallada de archivos y carpetas de cada módulo en el m
 
 ## 🤖 Nativo para agentes
 
-El API está pensado para que lo consuma una máquina, no solo una persona. Un archivo [`llms.txt`](https://www.cryptocapi.com/llms.txt) **en vivo** describe cada endpoint, sus parámetros y la forma de las respuestas en el formato estándar que leen los agentes de IA. Tu asistente en Claude Code, Cursor o Copilot descubre toda la superficie del API por su cuenta, sin que escribas una línea de código de integración.
+El API está pensado para que lo consuma una máquina, no solo una persona. Y desde 2026 hay dos caminos, no uno.
+
+### Servidor MCP nativo
+
+Si tu cliente habla **Model Context Protocol**, no hace falta escribir integración: los motores son herramientas nativas.
+
+```json
+{
+  "mcpServers": {
+    "cryptocapi": {
+      "command": "npx",
+      "args": ["-y", "@cryptocapi/mcp"]
+    }
+  }
+}
+```
+
+Eso es todo. Sin key, el paquete cae en la key pública de demostración y `get_insight` responde para bitcoin y ethereum, con su sello incluido.
+
+| Herramienta | Motor | Qué devuelve |
+|:---|:---|:---|
+| `get_insight` | Radar o Quant Plus | Análisis de un activo. Con `engine="quant_plus"`, el sello reproducible y su vector de entrada |
+| `get_signal` | Quant Pro | Señal de ejecución para un par de trading |
+| `batch_signals` | Quant Plus | Señales de varios activos en una llamada |
+| `scan_market` | Market Scan | Ranking del universo curado por fuerza de señal |
+
+Cuatro herramientas, y **las cuatro son motores propios**. El dato de terceros (precios, macro) se retiró de esta superficie a propósito: por MCP viaja solo lo que nuestros motores firman.
+
+El paquete es un **cliente delgado, no una segunda implementación**. Consume el mismo API público que cualquier otro consumidor y reenvía las respuestas **verbatim**, así que el `protocol_hash` que llega a tu agente es idéntico byte a byte al que sirvió el API. Se publica desde CI con **procedencia npm (SLSA)**, sin ningún token de larga vida: la única vía de publicar es un tag firmado sobre el repositorio público.
+
+Y cuando un motor no está incluido en tu pase, el error lo dice con nombre propio y con un código que tu agente puede ramificar, en vez de un 403 pelado que lo deje reintentando en círculos.
+
+### Descubrimiento por `llms.txt`
+
+Para todo lo demás, y para clientes que no hablan MCP, un archivo [`llms.txt`](https://www.cryptocapi.com/llms.txt) **en vivo** describe cada endpoint, sus parámetros y la forma de las respuestas en el formato estándar que leen los agentes.
 
 | Recurso | Para qué sirve |
 |:---|:---|
+| [`@cryptocapi/mcp` en npm](https://www.npmjs.com/package/@cryptocapi/mcp) | El servidor MCP nativo, con procedencia verificable |
 | [`llms.txt` en vivo](https://www.cryptocapi.com/llms.txt) | Mapa legible por agentes de todos los endpoints, autenticación y rate limits |
 | [Guía de IA y agentes](https://cryptocapi.com/docs/agentes) | Cómo integrar el API dentro de un flujo agéntico |
 | [Especificación OpenAPI](https://api.cryptocapi.com/v1/docs) | Contrato completo y navegable del API v1 |

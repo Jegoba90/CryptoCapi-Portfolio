@@ -48,15 +48,38 @@ The `seal_type` field is always present so consumers know exactly what they are 
 
 ## Verifying Quant Plus (Reproducible Seal)
 
-The Quant Plus `audit_trail` is self-contained: it carries everything needed to reproduce the result independently.
+The Quant Plus `audit_trail` is self-contained: it carries everything needed to reproduce the result independently. No external data source is required, and you never have to ask us for anything.
 
-1. Read the `audit_trail` from the response — it includes the `algorithm_id`, `engine_version`, input price vector, and computed outputs.
-2. Recompute the outputs using the embedded inputs and the algorithm identified in `algorithm_id`.
-3. Serialize the result with `json.dumps(sort_keys=True, separators=(",",":"))`.
-4. Compute `sha256(serialized_payload)` and compare against `protocol_hash`.
-5. A match confirms the data was not altered between computation and delivery.
+**Step 1 — recompute the numbers.** From `input_vector` alone you can reproduce all three:
 
-No external data or documentation is required — the `audit_trail` alone is sufficient.
+| Value | How |
+|---|---|
+| `z_score` | Logarithmic returns between consecutive prices (`ln(p[i]/p[i-1]) * 100`); take the latest return and score it against the mean and **sample** standard deviation of the previous 49. Round to 4 decimals. |
+| `bollinger_bandwidth` | SMA over the last 20 prices, bands at ±2 **population** standard deviations, each band rounded to 2 decimals, then `(upper - lower) / sma`. Round to 4 decimals. |
+| `market_regime` | Derived from `z_score`, `daily_change_pct` and the published `regime_thresholds`. |
+
+**Step 2 — build the payload.** Exactly these eight keys, taken from the response as published:
+
+```
+algorithm_id, bollinger_bandwidth, daily_change_pct, engine_version,
+input_timestamps, input_vector, market_regime, z_score
+```
+
+Note what is *not* in it: `calculated_at` is deliberately excluded. It is wall-clock metadata, and including it would make identical inputs produce different hashes.
+
+**Step 3 — apply the canonical number form.** This is the one rule you cannot skip, and it is one line:
+
+> **Every number becomes a fixed-precision decimal string with 6 decimals.**
+
+Integers and decimals are treated **identically**: `63482` becomes `"63482.000000"`, and `-0.6651` becomes `"-0.665100"`. The reason is simple and worth knowing: JSON does not record whether a number was an integer or a decimal, so any rule that depended on that distinction could not be reproduced from a response. Booleans stay booleans, and negative zero is normalized to zero.
+
+**Step 4 — serialize and hash.** `json.dumps(payload, sort_keys=True, separators=(",",":"))`, then `sha256` of those bytes, prefixed with `0x`. Compare against `protocol_hash`.
+
+A match confirms the response you are holding carries exactly the inputs and outputs that were sealed at computation time.
+
+> **Version boundary, stated plainly.** The canonical number form above applies to seals from **`v2.2.0-math`** onward (Radar `v2.2.0-radar`, Quant Pro `v1.1.0-quant`). Earlier seals serialized numbers directly, which meant a price landing on a whole number lost its decimal part in transport and the recomputed hash would not match. `engine_version` travels inside the response precisely so you can tell which rule applies to what you are holding.
+
+A complete, live response you can run this on is committed at [`api/examples/quant-plus-signal.json`](../api/examples/quant-plus-signal.json). It is a real bitcoin insight, and its vector contains one whole-number price, so verifying it exercises the canonical rule rather than assuming it.
 
 ---
 

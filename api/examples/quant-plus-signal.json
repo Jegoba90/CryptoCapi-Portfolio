@@ -1,38 +1,63 @@
 {
   "status": "success",
   "version": "1.0.0",
-  "timestamp": "2026-05-25T20:17:29.969Z",
+  "timestamp": "2026-09-01T15:03:57.044Z",
   "data": {
     "engine_used": "quant_plus",
     "asset": { "id": "bitcoin", "symbol": "BTC" },
-    "summary": "Equilibrio técnico.",
-    "sentiment": "neutral",
+    "generated_at": "2026-09-01T15:03:57.044Z",
+    "summary": "Lateralización en bandas normales, con leve presión bajista. Z-Score -0.67, al 19% de su umbral de anomalía (3.51).",
+    "sentiment": "bearish",
     "statistical_anomaly_detected": false,
     "confidence": {
-      "score": 0.61,
+      "score": 0.64,
       "label": "MEDIUM"
+    },
+    "math_diagnostics": {
+      "z_score": -0.6651,
+      "z_score_threshold": 3.5051,
+      "bollinger_bandwidth": 0.3667,
+      "market_regime": "RANGING_CHOP",
+      "extreme_volatility_detected": false,
+      "data_quality": "OPTIMAL",
+      "data_quality_reason": [],
+      "sentiment_override": false,
+      "anomaly_details": null,
+      "regime_thresholds": {
+        "volatility_hard_limit": 0.05,
+        "z_score_anomaly_boundary": 3.5051,
+        "daily_change_trend_boundary": 0.02
+      },
+      "audit_trail": {
+        "protocol_hash": "0x821ba8b9ed9ecc1cca1b16c1d6feb902a7614cb027f2132a1b46d74e3fe3540a",
+        "calculated_at": "2026-09-01T15:03:56.979793Z",
+        "seal_type": "reproducible",
+        "algorithm_id": "SMA-20 / 2σ / 50-period Z-Score (Returns)",
+        "engine_version": "v2.2.0-math",
+        "data_source": {
+          "vendor": "Yahoo Finance (51 daily closes)",
+          "symbol": "BTCUSDT",
+          "timeframe": "1d (50-period log_returns Z-Score)"
+        },
+        "input_timestamps": ["2026-07-13T00:00:00Z","2026-07-14T00:00:00Z","2026-07-15T00:00:00Z","2026-07-16T00:00:00Z","2026-07-17T00:00:00Z","2026-07-18T00:00:00Z","2026-07-19T00:00:00Z","2026-07-20T00:00:00Z","2026-07-21T00:00:00Z","2026-07-22T00:00:00Z","2026-07-23T00:00:00Z","2026-07-24T00:00:00Z","2026-07-25T00:00:00Z","2026-07-26T00:00:00Z","2026-07-27T00:00:00Z","2026-07-28T00:00:00Z","2026-07-29T00:00:00Z","2026-07-30T00:00:00Z","2026-07-31T00:00:00Z","2026-08-01T00:00:00Z","2026-08-02T00:00:00Z","2026-08-03T00:00:00Z","2026-08-04T00:00:00Z","2026-08-05T00:00:00Z","2026-08-06T00:00:00Z","2026-08-07T00:00:00Z","2026-08-08T00:00:00Z","2026-08-09T00:00:00Z","2026-08-10T00:00:00Z","2026-08-11T00:00:00Z","2026-08-12T00:00:00Z","2026-08-13T00:00:00Z","2026-08-14T00:00:00Z","2026-08-15T00:00:00Z","2026-08-16T00:00:00Z","2026-08-17T00:00:00Z","2026-08-18T00:00:00Z","2026-08-19T00:00:00Z","2026-08-20T00:00:00Z","2026-08-21T00:00:00Z","2026-08-22T00:00:00Z","2026-08-23T00:00:00Z","2026-08-24T00:00:00Z","2026-08-25T00:00:00Z","2026-08-26T00:00:00Z","2026-08-27T00:00:00Z","2026-08-28T00:00:00Z","2026-08-29T00:00:00Z","2026-08-30T00:00:00Z","2026-08-31T00:00:00Z","2026-09-01T00:00:00Z"],
+        "input_vector": [62239.1211,64956.1133,64712.375,63789.2812,63899.4609,64796.6016,64690.8047,65230.0273,66505.125,66100.7969,65044.8125,64098.4961,64311.8125,65340.3008,63724.8984,63871.3633,63908.168,64725.3086,62813.7461,62763.3203,63482,63460.8984,64055.9531,64597.5,64262.1133,64880.1914,64904.6875,64844.8867,63910.5859,63551.875,63402.4336,63402.1719,62975.5938,63024.3203,62818.6523,64506.2539,64680.7109,69266.1875,73032.7578,78335.1875,77083.4141,77755.2656,78964.4844,78564.9766,79027.4219,80257.5391,77830.2891,78245.8125,77667.5703,78548.6328,77860.8281],
+        "zscore_window_size": 49,
+        "daily_change_pct": -0.5919
+      }
+    },
+    "analysis": {
+      "detailed_report": "Régimen de mercado: lateralización. Precio opera en el tercio superior de las bandas de Bollinger. Z-Score (-0.67) indica presión bajista moderada."
     },
     "onchain_stats": {
       "network": "bitcoin-mainnet",
-      "network_congestion": "LOW",
       "whale_activity_alert": true,
+      "network_congestion": "LOW",
       "onchain_confidence_score": 0.9
     },
     "actionable_insight": {
       "signal": "HOLD",
-      "risk_level": "LOW"
-    },
-    "math_diagnostics": {
-      "z_score": 0.1705,
-      "bollinger_bandwidth": 0.0988,
-      "market_regime": "RANGING_CHOP",
-      "extreme_volatility_detected": false,
-      "data_quality": "OPTIMAL",
-      "sentiment_override": false,
-      "anomaly_details": null
-    },
-    "analysis": {
-      "detailed_report": "Régimen de mercado: lateralización. Precio opera en el tercio inferior de las bandas de Bollinger. Z-Score (0.17) en zona neutral — sin anomalías estadísticas."
+      "risk_level": "LOW",
+      "trigger_condition": "Z-Score en -0.67. Señal HOLD en régimen RANGING_CHOP — requiere |z| >= 3.51 para activar BUY_WATCH/SELL_WATCH, o régimen EXTREME_VOLATILITY para ALERT."
     }
   }
 }

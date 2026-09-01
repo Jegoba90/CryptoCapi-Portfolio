@@ -119,3 +119,18 @@ The scheduler runs continuously on a fixed core of **10 coins**, plus up to **5 
 | "Analyze PEPEUSDT — not in your universe" | Quant Pro |
 | "Which coins in your universe have the strongest buy signal?" | Market Scanner |
 | "I distrust AI — give me math only" | Quant Plus or Quant Pro |
+
+---
+
+## Reaching these engines from an AI agent
+
+All four are also exposed as native tools by the **MCP server** [`@cryptocapi/mcp`](https://www.npmjs.com/package/@cryptocapi/mcp), so an agent can call them without any REST integration:
+
+| Tool | Engine |
+|---|---|
+| `get_insight` | Radar, or Quant Plus with `engine="quant_plus"` |
+| `get_signal` | Quant Pro |
+| `batch_signals` | Quant Plus, several assets in one call |
+| `scan_market` | Market Scanner |
+
+The package is a thin client over this same API and forwards responses verbatim, so the `protocol_hash` an agent receives is byte-identical to the one documented in [SEAL.md](SEAL.md). Setup and the demo-key path are in the [README](../README.md#-nativo-para-agentes).

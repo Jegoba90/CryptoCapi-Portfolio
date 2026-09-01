@@ -23,7 +23,7 @@ Your key format tells you your current plan:
 
 | Format | Plan | Access |
 |---|---|---|
-| `sk_live_…` | **PRO / Alpha** | Full access — all engines, deep analysis, `audit_trail` |
+| `sk_live_…` | **PRO** | Deep analysis and `audit_trail` for **the engine that key holds** (see Entitlement below) |
 | `flash_…` | **Free / Pulse** | Public data + Pulse View (summaries only, numeric fields stripped) |
 | `demo_btc_eth_public` | **Demo** | Shared public key — Radar insights for `bitcoin`/`ethereum` only, full Alpha payload |
 
@@ -52,8 +52,9 @@ x-api-key: demo_btc_eth_public
 
 ### PRO (Alpha / Deep Alpha)
 - Activated by trial or PayPal pass.
-- Full access to all engines: Radar insights (Alpha View), Quant Plus, Quant Pro, Market Scanner.
-- Insights endpoint returns the complete payload including `math_diagnostics`, `confidence`, and the `audit_trail` seal.
+- Unlocks deep analysis for **the engine that pass covers**, not for all four. See Entitlement below.
+- For that engine, the insights endpoint returns the complete payload including `math_diagnostics`, `confidence`, and the `audit_trail` seal.
+- The 14-day trial is the exception: it is meant to show the whole product, so it opens every engine for its duration.
 - Rate limit: **10,000 requests / hour**.
 
 #### 14-Day Free Trial
@@ -151,9 +152,48 @@ When a limit is exceeded the API returns:
 
 ---
 
+## Entitlement: one pass per engine
+
+Access is decided by **two independent attributes**, and confusing them is the classic mistake:
+
+| Attribute | Question it answers | Values |
+|---|---|---|
+| **plan** | Is this key paid and current? | `free`, `pro`, `internal`, `demo` |
+| **product** | Which engine was bought? | `pulse`, `alpha`, `quant`, `quant_plus`, `market_scan` |
+
+The four products are sold separately, so **buying one engine grants exactly that engine**. Holding Quant Pro does not open Quant Plus. This is enforced server-side on every route, not in the client.
+
+It also applies *within* a single endpoint: `GET /market/insights/:id` serves two different engines depending on `?engine=`, and each one requires its own pass (`alpha` for Radar, `quant_plus` for Quant Plus).
+
+### The two error codes, and why there are two
+
+A missing pass returns `403` naming the exact product, with a machine-readable `code` so you never have to parse prose:
+
+| `code` | Meaning | What to do |
+|---|---|---|
+| `PRODUCT_NOT_INCLUDED` | This key never included that engine | Buy that pass. Retrying with the same key fails identically. |
+| `PRODUCT_NOT_ACTIVE` | This key **does** hold that engine, but the pass lapsed | **Renew.** You already own it. |
+
+A real response, captured from production with the public demo key:
+
+```json
+{
+  "status": "error",
+  "message": "Your API key does not include this engine. Required product: 'market_scan'.",
+  "code": "PRODUCT_NOT_INCLUDED",
+  "required_product": "market_scan"
+}
+```
+
+`required_product` is always present. `your_product` is added when the key holds *some other* engine, so a client can say "you have Quant Pro, this needs Market Scan" without a second request. It is absent above because the demo key has no product attributed to it.
+
+Branch on `code`, never on the message text. The distinction between the two exists because telling somebody with an expired pass that their key "does not include" the engine is false, and it sends them to buy something they already own.
+
+---
+
 ## Payload Shaping by Key Tier
 
-> This section applies **only to `GET /market/insights/:id` (Radar)**. All other PRO endpoints (Quant Plus, Quant Pro, Market Scanner) return `403 Forbidden` for free keys — there is no reduced-payload fallback.
+> This section applies **only to `GET /market/insights/:id`**. The other engines (Quant Plus, Quant Pro, Market Scan) have no reduced-payload fallback: without the right pass they return `403` with a `code`, as described in Entitlement above.
 
 The `/market/insights/:id` response structure changes based on your key. **Do not assume missing fields are `null`** — they are simply absent in the free tier. Use optional chaining:
 
