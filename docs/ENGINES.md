@@ -133,4 +133,15 @@ All four are also exposed as native tools by the **MCP server** [`@cryptocapi/mc
 | `batch_signals` | Quant Plus, several assets in one call |
 | `scan_market` | Market Scanner |
 
-The package is a thin client over this same API and forwards responses verbatim, so the `protocol_hash` an agent receives is byte-identical to the one documented in [SEAL.md](SEAL.md). Setup and the demo-key path are in the [README](../README.md#-nativo-para-agentes).
+The package is a thin client over this same API and forwards responses verbatim, so the `protocol_hash` an agent receives is byte-identical to the one documented in [SEAL.md](SEAL.md). It is listed in the official MCP Registry as `io.github.Jegoba90/cryptocapi`, so clients that read that registry find it without being handed a URL. Setup and the demo-key path are in the [README](../README.md#-nativo-para-agentes).
+
+If your client does not speak MCP, the same engines are reachable over plain HTTP, and the domain says where everything is:
+
+| Resource | What it is |
+|---|---|
+| [`/v1/openapi.json`](https://api.cryptocapi.com/v1/openapi.json) | The OpenAPI contract as a downloadable document, not the Swagger UI |
+| [`/.well-known/api-catalog`](https://www.cryptocapi.com/.well-known/api-catalog) | RFC 9727 linkset: contract, HTML reference, health endpoint |
+| [`/.well-known/ai-catalog.json`](https://www.cryptocapi.com/.well-known/ai-catalog.json) | Every machine-readable resource, enumerated |
+| [`llms.txt`](https://www.cryptocapi.com/llms.txt) | Entry index: what each engine does, how to authenticate, where to go next |
+
+Both catalogs are announced in a `Link` header on every response. Editorial pages also have a markdown mirror: append `.md` to a page URL. **Branch on the `Content-Type`, not the status code** — a `.md` URL with no mirror returns 200 with the HTML shell, so `text/markdown` is the only reliable signal that the mirror exists.

@@ -67,7 +67,7 @@ Lyapunov y datos on-chain leídos directamente de la blockchain.
 
 | Motor | Rol | Tecnología clave |
 |:---|:---|:---|
-| 📡 **Motor Radar** | Ingesta noticias institucionales (Bloomberg, Reuters, Cointelegraph) y genera sentimiento + resúmenes ejecutivos sin sensacionalismo. La matemática determinista valida o invalida la narrativa antes de publicarla. | `Python` · `LLM engine (multi-model)` · `feedparser` · `BeautifulSoup` |
+| 📡 **Motor Radar** | Ingesta seis fuentes RSS verificadas (Cointelegraph, CoinDesk, Decrypt, The Block, Bitcoin Magazine, CryptoSlate) y genera sentimiento + resúmenes ejecutivos sin sensacionalismo. Cada fuente entra con su tier de credibilidad, y la matemática determinista valida o invalida la narrativa antes de publicarla. | `Python` · `LLM engine (multi-model)` · `feedparser` · `BeautifulSoup` |
 | 📊 **Motor Quant PRO** | Señal cuantitativa on-demand sobre cualquier par de Binance: filtro de Kalman adaptativo para reducir ruido, exponente de Lyapunov para detectar caos de mercado y Matriz de Intercepción de Régimen (MIR) dual-timeframe 1D/4H. | `NumPy` · `SciPy` · `Pandas` · `TA-Lib` · `Binance REST` |
 | 📈 **Motor Quant Plus** | Señales estadísticas pre-computadas sobre 50 períodos: Z-Score logarítmico con umbral t-Student (α=0.001), enriquecimiento on-chain vía RPC (congestión de red, actividad de ballenas) e insight accionable con sello SHA-256 reproducible. | `NumPy` · `SciPy` · `Pydantic` · `Mempool RPC` |
 
@@ -222,31 +222,32 @@ Conoce la distribución detallada de archivos y carpetas de cada módulo en el m
 
 ## 🔬 Outputs de ejemplo · Qué devuelve cada motor
 
-> Respuestas reales del sistema sobre **BTC**. Radar capturado el **2026-07-16** con la demo key pública; Quant PRO y Quant Plus, el **2026-05-25**. Los pesos internos de los indicadores no se publican.
+> Respuestas reales del sistema sobre **BTC**. Radar capturado el **2026-09-03** con la demo key pública; Quant PRO y Quant Plus, el **2026-05-25**. Los pesos internos de los indicadores no se publican.
 
 <details>
-<summary>📡 Motor Radar — Sentimiento institucional · sello audit_trail</summary>
+<summary>📡 Motor Radar — Sentimiento sobre fuentes verificadas · sello audit_trail</summary>
 
 ```json
 {
   "status": "success",
   "version": "1.0.0",
-  "timestamp": "2026-07-16T16:33:49.044Z",
+  "timestamp": "2026-09-03T23:04:24.278Z",
   "data": {
     "engine_used": "radar",
     "asset": { "id": "bitcoin", "symbol": "BTC" },
-    "summary": "Equilibrio técnico.",
-    "sentiment": "neutral",
+    "generated_at": "2026-09-03T23:04:24.278Z",
+    "summary": "fortaleza estructural",
+    "sentiment": "bullish",
     "statistical_anomaly_detected": false,
     "confidence": {
-      "score": 0.6,
-      "label": "MEDIUM"
+      "score": 0.95,
+      "label": "HIGH"
     },
     "math_diagnostics": {
-      "z_score": 0.015,
+      "z_score": 2.2794,
       "z_score_threshold": 3.5051,
-      "bollinger_bandwidth": 0.1195,
-      "market_regime": "RANGING_CHOP",
+      "bollinger_bandwidth": 0.3225,
+      "market_regime": "BULLISH_TREND",
       "extreme_volatility_detected": false,
       "data_quality": "OPTIMAL",
       "data_quality_reason": [],
@@ -258,15 +259,18 @@ Conoce la distribución detallada de archivos y carpetas de cada módulo en el m
         "daily_change_trend_boundary": 0.02
       },
       "audit_trail": {
-        "protocol_hash": "0x1fc3502d2b4632e28c60c8b8dbe5c87bb35df1936c09723d043f9457c27e8f28",
-        "calculated_at": "2026-07-16T16:33:48.661922Z",
+        "protocol_hash": "0x4440a68517f2929f7c73a90835b8624f8f9861b6d43dca3c37646d351e4de18c",
+        "calculated_at": "2026-09-03T23:04:24.207146Z",
         "seal_type": "process_seal",
         "algorithm_id": "Radar 4-Layer Anti-Hallucination Pipeline",
-        "engine_version": "v2.1.0-radar",
-        "filters_applied": [],
+        "engine_version": "v2.2.0-radar",
+        "filters_applied": [
+          "LEY 7 volume"
+        ],
         "fields_overridden": [
           "analysis.anomaly_details",
           "analysis.confidence",
+          "analysis.detailed_report",
           "analysis.sentiment_score",
           "confidence",
           "is_volatility_alert"
@@ -275,16 +279,11 @@ Conoce la distribución detallada de archivos y carpetas de cada módulo en el m
       }
     },
     "analysis": {
-      "detailed_report": "La posición en Bandas de Bollinger es TERCIO_SUPERIOR. El precio opera en un régimen de lateralización, sin un catalizador fundamental evidente en las noticias recientes.",
+      "detailed_report": "El estado de las bandas indica COMPRESIÓN activa, sugiriendo acumulación de energía volátil previa a una posible expansión direccional. El Z-Score positivo confirma la fortaleza relativa del precio frente a la media móvil. En el frente macroestructural, se observa un pivote significativo en la industria minera: operadores como Hyperscale están desmantelando infraestructura de Bitcoin para contratos de Inteligencia Artificial de alto valor. Este fenómeno representa una reasignación estructural de capital y energía a largo plazo, aunque el impacto inmediato en la oferta circulante es marginal. La acción del precio actual responde a dinámicas técnicas de ruptura, mientras el fundamento sectorial evoluciona hacia la diversificación energética.",
       "sources_verified": [
         {
-          "title": "The most popular bitcoin call option has slipped by $10,000",
-          "url": "https://www.coindesk.com/daybook-us/2026/07/16/the-most-popular-bitcoin-call-option-has-slipped-by-usd10-000",
-          "credibility": "Tier 1"
-        },
-        {
-          "title": "Dormant Bitcoin Whale Moves $383 Million After More Than 8 Years",
-          "url": "https://decrypt.co/373646/bitcoin-whale-moves-383-million-after-eight-years",
+          "title": "Bitcoin Miner Ditches Site for AI Deal That Could Top $1.2 Billion",
+          "url": "https://decrypt.co/377363/bitcoin-mine-ai-deal-1-2-billion",
           "credibility": "Tier 2"
         }
       ],
@@ -294,7 +293,7 @@ Conoce la distribución detallada de archivos y carpetas de cada módulo en el m
 }
 ```
 
-> El `audit_trail` declara qué corrigió Python sobre la salida del LLM: `fields_overridden` lista los campos sobrescritos con valores deterministas y `filters_applied` los filtros léxicos que se dispararon. Cómo verificar el hash: [SEAL.md](docs/SEAL.md). `sources_verified` está abreviado aquí; la respuesta íntegra está en [api/examples/radar-alpha.json](api/examples/radar-alpha.json).
+> El `audit_trail` declara qué corrigió Python sobre la salida del LLM: `fields_overridden` lista los campos sobrescritos con valores deterministas y `filters_applied`, los filtros léxicos que se dispararon — en esta captura saltó uno, `LEY 7 volume`, y el pipeline llegó a reescribir el propio `detailed_report`. Cómo verificar el hash: [SEAL.md](docs/SEAL.md). La respuesta va entera, sin recortar, y está commiteada tal cual en [api/examples/radar-alpha.json](api/examples/radar-alpha.json).
 
 </details>
 
@@ -421,7 +420,7 @@ Este es el motor cuyo sello **podés recalcular vos**. El vector de entrada abaj
 
 ## 🤖 Nativo para agentes
 
-El API está pensado para que lo consuma una máquina, no solo una persona. Y desde 2026 hay dos caminos, no uno.
+El API está pensado para que lo consuma una máquina, no solo una persona. Y desde 2026 hay tres caminos: el servidor MCP, el sitio legible por agentes y el descubrimiento por catálogos. Ninguno pide que escribas glue code.
 
 ### Servidor MCP nativo
 
@@ -453,16 +452,48 @@ El paquete es un **cliente delgado, no una segunda implementación**. Consume el
 
 Y cuando un motor no está incluido en tu pase, el error lo dice con nombre propio y con un código que tu agente puede ramificar, en vez de un 403 pelado que lo deje reintentando en círculos.
 
-### Descubrimiento por `llms.txt`
+Está dado de alta en el **registro oficial de MCP** como [`io.github.Jegoba90/cryptocapi`](https://registry.modelcontextprotocol.io/v0/servers?search=cryptocapi), con la propiedad del paquete verificada contra el tarball publicado en npm. Los clientes que leen ese registro lo encuentran sin que nadie les pase una URL.
 
-Para todo lo demás, y para clientes que no hablan MCP, un archivo [`llms.txt`](https://www.cryptocapi.com/llms.txt) **en vivo** describe cada endpoint, sus parámetros y la forma de las respuestas en el formato estándar que leen los agentes.
+### El sitio, legible por un agente
+
+El sitio es una SPA renderizada en el cliente: hasta hace poco, cualquier ruta devolvía el mismo cascarón HTML de 44 KB. Un agente sin navegador se llevaba el marco y nada del contenido. Ya no.
+
+**Agregá `.md` a la URL de una página y te devuelve esa página en markdown**, generada desde la página misma en cada despliegue:
+
+```bash
+curl https://www.cryptocapi.com/docs/agentes.md
+```
+
+| Documento | URL |
+|:---|:---|
+| Portada | [`/.md`](https://www.cryptocapi.com/.md) |
+| Referencia del API | [`/docs/api.md`](https://www.cryptocapi.com/docs/api.md) |
+| Guía de IA y agentes | [`/docs/agentes.md`](https://www.cryptocapi.com/docs/agentes.md) |
+
+> **Ramificá por el `Content-Type`, no por el código de estado.** Una URL `.md` sin espejo devuelve **200 con el cascarón HTML**, así que `text/markdown` es la única señal fiable de que el espejo existe. Es el error más fácil de cometer contra esta superficie, y por eso está escrito acá.
+
+**Las vistas de mercado quedan fuera del espejo a propósito.** Precios, resumen de mercado y macro son dato de terceros que sirve el API; espejarlos como documentos convertiría el sitio en un feed gratis de aquello para lo que están los motores. La ausencia es una decisión, no un hueco.
+
+### Descubrimiento: que no haya que adivinar nada
+
+El dominio **anuncia dónde está todo lo legible por máquina** con una cabecera `Link` en cada respuesta, apuntando a dos catálogos:
+
+| Catálogo | Qué es |
+|:---|:---|
+| [`/.well-known/api-catalog`](https://www.cryptocapi.com/.well-known/api-catalog) | Linkset **RFC 9727**: el documento OpenAPI, la referencia navegable y el endpoint de salud |
+| [`/.well-known/ai-catalog.json`](https://www.cryptocapi.com/.well-known/ai-catalog.json) | Enumera todos los recursos legibles por máquina, uno por uno |
+
+Y el contrato **se puede bajar, no solo mirar**: [`/v1/openapi.json`](https://api.cryptocapi.com/v1/openapi.json) sirve el documento OpenAPI en sí, no el Swagger UI. La proyección publicada filtra los servidores de desarrollo, así que un cliente generado no puede terminar apuntando a `localhost`.
+
+Para clientes que no hablan MCP, el archivo [`llms.txt`](https://www.cryptocapi.com/llms.txt) **en vivo** es el índice de entrada: qué hace cada motor, cómo autenticarse, y desde dónde seguir hacia el resto de los documentos.
 
 | Recurso | Para qué sirve |
 |:---|:---|
 | [`@cryptocapi/mcp` en npm](https://www.npmjs.com/package/@cryptocapi/mcp) | El servidor MCP nativo, con procedencia verificable |
-| [`llms.txt` en vivo](https://www.cryptocapi.com/llms.txt) | Mapa legible por agentes de todos los endpoints, autenticación y rate limits |
+| [`llms.txt` en vivo](https://www.cryptocapi.com/llms.txt) | Índice legible por agentes: motores, autenticación y a dónde ir después |
+| [Contrato OpenAPI descargable](https://api.cryptocapi.com/v1/openapi.json) | El documento en sí, para generar un cliente |
+| [Referencia navegable del API](https://api.cryptocapi.com/v1/docs) | El mismo contrato, para leerlo con ojos humanos |
 | [Guía de IA y agentes](https://cryptocapi.com/docs/agentes) | Cómo integrar el API dentro de un flujo agéntico |
-| [Especificación OpenAPI](https://api.cryptocapi.com/v1/docs) | Contrato completo y navegable del API v1 |
 
 **Funciona donde construyas:** Claude Code · Cursor · GitHub Copilot · ChatGPT · LangChain · cualquier cliente REST.
 

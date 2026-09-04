@@ -71,7 +71,8 @@ cryptocapi-refactor/
 │
 ├── 📂 frontend/                        # Vite + Vanilla TypeScript (Firebase Hosting)
 │   ├── src/
-│   │   ├── core/                       # App init, router, events, domain (DDD)
+│   │   ├── core/                       # App init, router, events, domain (DDD),
+│   │   │                               #   agentCatalog (.well-known), sitemapRoutes
 │   │   ├── features/                   # access, api, api-management, auth, community,
 │   │   │                               #   docs, home, market, methodology, portfolio,
 │   │   │                               #   precios, search, status, shared
@@ -80,8 +81,9 @@ cryptocapi-refactor/
 │   │   ├── config/                     # Endpoints, constants
 │   │   ├── types/                      # TypeScript definitions
 │   │   └── css/                        # Tailwind + custom CSS
+│   ├── scripts/                        # generate-agent-mirror (.md mirror, per deploy)
 │   ├── tests/                          # Playwright E2E tests
-│   ├── public/                         # Static assets
+│   ├── public/                         # Static assets + llms.txt, robots.txt, sitemap.xml
 │   └── vite.config.js / playwright.config.js
 │
 ├── 📂 shared/                          # 🔗 Shared contracts (source of truth)
