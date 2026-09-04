@@ -1,22 +1,23 @@
 {
   "status": "success",
   "version": "1.0.0",
-  "timestamp": "2026-07-16T16:33:49.044Z",
+  "timestamp": "2026-09-03T23:04:24.278Z",
   "data": {
     "engine_used": "radar",
     "asset": { "id": "bitcoin", "symbol": "BTC" },
-    "summary": "Equilibrio técnico.",
-    "sentiment": "neutral",
+    "generated_at": "2026-09-03T23:04:24.278Z",
+    "summary": "fortaleza estructural",
+    "sentiment": "bullish",
     "statistical_anomaly_detected": false,
     "confidence": {
-      "score": 0.6,
-      "label": "MEDIUM"
+      "score": 0.95,
+      "label": "HIGH"
     },
     "math_diagnostics": {
-      "z_score": 0.015,
+      "z_score": 2.2794,
       "z_score_threshold": 3.5051,
-      "bollinger_bandwidth": 0.1195,
-      "market_regime": "RANGING_CHOP",
+      "bollinger_bandwidth": 0.3225,
+      "market_regime": "BULLISH_TREND",
       "extreme_volatility_detected": false,
       "data_quality": "OPTIMAL",
       "data_quality_reason": [],
@@ -28,15 +29,18 @@
         "daily_change_trend_boundary": 0.02
       },
       "audit_trail": {
-        "protocol_hash": "0x1fc3502d2b4632e28c60c8b8dbe5c87bb35df1936c09723d043f9457c27e8f28",
-        "calculated_at": "2026-07-16T16:33:48.661922Z",
+        "protocol_hash": "0x4440a68517f2929f7c73a90835b8624f8f9861b6d43dca3c37646d351e4de18c",
+        "calculated_at": "2026-09-03T23:04:24.207146Z",
         "seal_type": "process_seal",
         "algorithm_id": "Radar 4-Layer Anti-Hallucination Pipeline",
-        "engine_version": "v2.1.0-radar",
-        "filters_applied": [],
+        "engine_version": "v2.2.0-radar",
+        "filters_applied": [
+          "LEY 7 volume"
+        ],
         "fields_overridden": [
           "analysis.anomaly_details",
           "analysis.confidence",
+          "analysis.detailed_report",
           "analysis.sentiment_score",
           "confidence",
           "is_volatility_alert"
@@ -45,22 +49,12 @@
       }
     },
     "analysis": {
-      "detailed_report": "La posición en Bandas de Bollinger es TERCIO_SUPERIOR. El precio opera en un régimen de lateralización, sin un catalizador fundamental evidente en las noticias recientes.",
+      "detailed_report": "El estado de las bandas indica COMPRESIÓN activa, sugiriendo acumulación de energía volátil previa a una posible expansión direccional. El Z-Score positivo confirma la fortaleza relativa del precio frente a la media móvil. En el frente macroestructural, se observa un pivote significativo en la industria minera: operadores como Hyperscale están desmantelando infraestructura de Bitcoin para contratos de Inteligencia Artificial de alto valor. Este fenómeno representa una reasignación estructural de capital y energía a largo plazo, aunque el impacto inmediato en la oferta circulante es marginal. La acción del precio actual responde a dinámicas técnicas de ruptura, mientras el fundamento sectorial evoluciona hacia la diversificación energética.",
       "sources_verified": [
         {
-          "title": "The most popular bitcoin call option has slipped by $10,000",
-          "url": "https://www.coindesk.com/daybook-us/2026/07/16/the-most-popular-bitcoin-call-option-has-slipped-by-usd10-000",
-          "credibility": "Tier 1"
-        },
-        {
-          "title": "Dormant Bitcoin Whale Moves $383 Million After More Than 8 Years",
-          "url": "https://decrypt.co/373646/bitcoin-whale-moves-383-million-after-eight-years",
+          "title": "Bitcoin Miner Ditches Site for AI Deal That Could Top $1.2 Billion",
+          "url": "https://decrypt.co/377363/bitcoin-mine-ai-deal-1-2-billion",
           "credibility": "Tier 2"
-        },
-        {
-          "title": "Jeff Booth, Lyn Alden-backed ORANGE JUICE raises $40 million to launch permanent capital firm with b...",
-          "url": "https://www.theblock.co/post/408594/jeff-booth-lyn-alden-backed-orange-juice-raises-40-million-to-launch-permanent-capital-firm-with-bitcoin-treasury-strategy?utm_source=rss&utm_medium=rss",
-          "credibility": "Tier 1"
         }
       ],
       "sources_window": "24h"
