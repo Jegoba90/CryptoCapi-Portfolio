@@ -55,7 +55,7 @@ The Quant Plus `audit_trail` is self-contained: it carries everything needed to 
 | Value | How |
 |---|---|
 | `z_score` | Logarithmic returns between consecutive prices (`ln(p[i]/p[i-1]) * 100`); take the latest return and score it against the mean and **sample** standard deviation of the previous 49. Round to 4 decimals. |
-| `bollinger_bandwidth` | SMA over the last 20 prices, bands at ±2 **population** standard deviations, each band rounded to 2 decimals, then `(upper - lower) / sma`. Round to 4 decimals. |
+| `bollinger_bandwidth` | SMA over the last 20 prices, bands at ±2 **population** standard deviations at full precision, then `(upper - lower) / sma`. Round to 4 decimals. Seals up to `v2.2.0-math` rounded each band to 2 decimals before the ratio. |
 | `market_regime` | Derived from `z_score`, `daily_change_pct` and the published `regime_thresholds`. |
 
 **Step 2 — build the payload.** Exactly these eight keys, taken from the response as published:
@@ -133,8 +133,10 @@ async function sealHash(payload) {
 A match confirms the response you are holding carries exactly the inputs and outputs that were sealed at computation time.
 
 > **Version boundary, stated plainly.** The canonical number form above applies to seals from **`v2.2.0-math`** onward (Radar `v2.2.0-radar`, Quant Pro `v1.1.0-quant`). Earlier seals serialized numbers directly, which meant a price landing on a whole number lost its decimal part in transport and the recomputed hash would not match. `engine_version` travels inside the response precisely so you can tell which rule applies to what you are holding.
+>
+> **Second boundary: `v2.3.0-math`.** The Bollinger bands are no longer rounded before the ratio, and `input_vector` carries the exact values the engine computed with (up to `v2.2.0-math` it was rounded to 4 decimals). With the full-precision vector, exact ties at 6 decimals are common, so the rounding rule of step 3 stops being a detail. The series also holds closed daily candles only: the last date in the vector is the last complete day, never a live price. On Radar, `v2.3.0-radar` lowercases the model's sentiment before sealing it, and when the model gives no valid one, Python sets `neutral` and the trail says so in `sentiment_override`.
 
-A complete, live response you can run this on is committed at [`api/examples/quant-plus-signal.json`](../api/examples/quant-plus-signal.json). It is a real bitcoin insight, and its vector contains one whole-number price, so verifying it exercises the canonical rule rather than assuming it.
+A complete, live response you can run this on is committed at [`api/examples/quant-plus-signal.json`](../api/examples/quant-plus-signal.json). It is a real bitcoin insight sealed with `v2.2.0-math` (so its bands follow the earlier rounding rule), and its vector contains one whole-number price, so verifying it exercises the canonical rule rather than assuming it.
 
 ---
 
