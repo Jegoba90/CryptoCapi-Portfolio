@@ -73,7 +73,62 @@ Note what is *not* in it: `calculated_at` is deliberately excluded. It is wall-c
 
 Integers and decimals are treated **identically**: `63482` becomes `"63482.000000"`, and `-0.6651` becomes `"-0.665100"`. The reason is simple and worth knowing: JSON does not record whether a number was an integer or a decimal, so any rule that depended on that distinction could not be reproduced from a response. Booleans stay booleans, and negative zero is normalized to zero.
 
+**How the 6 decimals round.** Half to even, on the exact binary value of the number: what Python's `format(x, '.6f')` and C's `printf("%.6f")` do. `0.0078125` becomes `"0.007812"`, and `0.0234375` becomes `"0.023438"`. JavaScript's `toFixed(6)` rounds an exact tie up instead (`"0.007813"`), so it does not reproduce the seal. Ties are common in practice: the price feed delivers float32 values, which at bitcoin's level are multiples of 1/128 or 1/256, and every odd multiple of 1/128 has exactly seven decimals ending in 5. Whenever prices travel at full precision, about half of bitcoin's are exact ties.
+
 **Step 4 — serialize and hash.** `json.dumps(payload, sort_keys=True, separators=(",",":"))`, then `sha256` of those bytes, prefixed with `0x`. Compare against `protocol_hash`.
+
+`json.dumps` escapes every character outside printable ASCII as `\uXXXX` with lowercase hex, and that is part of the bytes: the Quant Plus `algorithm_id` contains a sigma (`σ`), which is hashed as `\u03c3`. `JSON.stringify` keeps it as is, so in JavaScript the escape has to be applied by hand.
+
+A complete reference in JavaScript (any modern browser, or Node 19+), with both rules:
+
+```js
+// Six decimals, rounded half to even on the exact value of the double: what
+// Python's format(x, '.6f') does. toFixed(6) rounds exact ties up instead.
+function fixed6(x) {
+  if (x === 0) return '0.000000'; // also -0
+  const view = new DataView(new ArrayBuffer(8));
+  view.setFloat64(0, Math.abs(x));
+  const bits = view.getBigUint64(0);
+  const biased = Number((bits >> 52n) & 0x7ffn);
+  const fraction = bits & ((1n << 52n) - 1n);
+  const mantissa = biased === 0 ? fraction : fraction | (1n << 52n);
+  const exponent = (biased === 0 ? 1 : biased) - 1075;
+  let num = mantissa * 1000000n;
+  let den = 1n;
+  if (exponent >= 0) num <<= BigInt(exponent);
+  else den <<= BigInt(-exponent);
+  let q = num / den;
+  const twice = 2n * (num % den);
+  if (twice > den || (twice === den && q % 2n === 1n)) q += 1n;
+  const digits = q.toString().padStart(7, '0');
+  return (x < 0 ? '-' : '') + digits.slice(0, -6) + '.' + digits.slice(-6);
+}
+
+// Step 3: every number to its 6-decimal string, keys sorted.
+function canonical(value) {
+  if (typeof value === 'number') return fixed6(value);
+  if (Array.isArray(value)) return value.map(canonical);
+  if (value !== null && typeof value === 'object') {
+    const out = {};
+    for (const key of Object.keys(value).sort()) out[key] = canonical(value[key]);
+    return out;
+  }
+  return value;
+}
+
+// Step 4: compact JSON, non-ASCII escaped like Python, then SHA-256.
+async function sealHash(payload) {
+  const json = JSON.stringify(canonical(payload)).replace(
+    /[\u007f-\uffff]/g,
+    (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'),
+  );
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(json));
+  return '0x' + [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+// payload = the eight keys of step 2, taken from the response as published.
+// (await sealHash(payload)) === audit_trail.protocol_hash
+```
 
 A match confirms the response you are holding carries exactly the inputs and outputs that were sealed at computation time.
 
