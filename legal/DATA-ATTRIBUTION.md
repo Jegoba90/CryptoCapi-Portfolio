@@ -1,6 +1,6 @@
 # Data Attribution — CryptoCapi
 
-CryptoCapi aggregates data from the following third-party providers. Each provider's data is subject to their own terms of service.
+CryptoCapi uses data from the following third-party providers, as input to its engines and in its free public endpoints. Each provider's data is subject to their own terms of service.
 
 ---
 
@@ -12,7 +12,7 @@ CryptoCapi aggregates data from the following third-party providers. Each provid
 **Binance** — Live OHLCV candle data used exclusively by the Quant Pro engine for on-demand dual-timeframe analysis.
 [binance.com](https://www.binance.com)
 
-**Yahoo Finance** — Historical daily price data (90-day window) used for statistical calculations in the Quant Plus and Radar engines.
+**Yahoo Finance** — Daily closing prices (a 90-day window, closed days only) used for the statistical calculations of the Quant Plus and Radar engines.
 
 ---
 
@@ -36,6 +36,12 @@ Radar engine insights are informed by headlines and article content from the fol
 - [The Block](https://www.theblock.co)
 - [Bitcoin Magazine](https://bitcoinmagazine.com)
 - [CryptoSlate](https://cryptoslate.com)
+
+The news section of the site shows headlines from these public RSS feeds, each linking to the original:
+
+- [CriptoNoticias](https://www.criptonoticias.com)
+- [Cointelegraph](https://es.cointelegraph.com)
+- [BeInCrypto](https://es.beincrypto.com)
 - [CryptoPotato](https://cryptopotato.com)
 - [Bitcoinist](https://bitcoinist.com)
 

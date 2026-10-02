@@ -1,18 +1,17 @@
 # 🗺️ CryptoCapi — Estructura del Proyecto
 
-Monorepo de 3 servicios (Backend Node, Collector Python, Frontend Vite) con contratos compartidos. El núcleo del producto son **3 motores**: **Radar** (NLP/IA), **Quant Pro** (matemático/Binance) y **Quant Plus** (on-chain, 100% determinista).
+Monorepo de 3 servicios (Backend Node, Collector Python, Frontend Vite) con contratos compartidos. El núcleo del producto son **4 motores**: **Radar** (NLP/IA), **Quant Pro** (matemático/Binance), **Quant Plus** (estadístico + on-chain, 100% determinista) y **Market Scan** (ranking sobre las señales de Quant Plus).
 
 ```
 cryptocapi-refactor/
 │
 ├── 📄 Raíz (monorepo + documentación)
 │   ├── README.md                       # Documentación principal
-│   ├── PRODUCT_SPECIFICATIONS.md       # Especificación de los 3 motores
+│   ├── PRODUCT_SPECIFICATIONS.md       # Especificación de los motores
 │   ├── TECHNICAL_CONSTITUTION.md       # Leyes de ingeniería CTC-2026
 │   ├── BUSINESS_RULES.md               # Definiciones de dominio
-│   ├── firebase.json / .firebaserc     # Firebase hosting + functions
+│   ├── firebase.json / .firebaserc     # Firebase Hosting
 │   ├── firestore.rules                 # Reglas de seguridad Firestore
-│   ├── cloudbuild.yaml                 # Cloud Build (raíz)
 │   ├── package.json                    # Workspace root + scripts lint:all
 │   └── LICENSE                         # MIT License
 │
@@ -27,9 +26,9 @@ cryptocapi-refactor/
 │   │   │   ├── asset/                  # Assets (coins, tokens)
 │   │   │   ├── internal/               # Internal endpoints (collector -> backend)
 │   │   │   ├── market/                 # Market data, insights, ETF, macro
-│   │   │   ├── payments/               # Stripe / monetization
+│   │   │   ├── payments/               # PayPal / monetization
 │   │   │   ├── proxy/                  # Requests proxy
-│   │   │   └── quant/                  # Quant Pro (on-demand proxy to engine)
+│   │   │   └── quant/                  # Quant Pro (on-demand proxy to engine), Quant Plus batch, Market Scan
 │   │   ├── workers/                    # sanitizer.worker.ts (worker threads)
 │   │   ├── scripts/                    # init-db, generate-key, audits
 │   │   ├── shared/                     # Config, logger, cache (Redis), DB (Neon)
@@ -49,7 +48,7 @@ cryptocapi-refactor/
 │   │   ├── math_engine.py              # MathContext: Z-Score (t-Student), Bollinger, regime
 │   │   ├── onchain_manager.py          # On-chain: Alchemy (ETH gas) + Mempool.space (BTC)
 │   │   ├── api_client.py               # CoinGecko API client
-│   │   ├── yfinance_client.py          # Yahoo Finance client (90d daily)
+│   │   ├── yfinance_client.py          # Yahoo Finance client (verified ticker, closed daily candles)
 │   │   ├── fred_client.py              # Federal Reserve API client (macro)
 │   │   ├── world_bank_client.py        # World Bank API client (global inflation)
 │   │   └── news_scraper.py             # RSS news feed ingestor
@@ -64,6 +63,7 @@ cryptocapi-refactor/
 │   ├── config/                         # settings.py, shared_config.py
 │   ├── database/                       # PostgreSQL connection
 │   ├── tests/unit/                     # Unit tests (post-LLM filters, seal)
+│   ├── tests/acceptance/               # Gate go/no-go determinista (corre en CI)
 │   ├── tools/                          # Diagnostics scripts (divergence, type-check)
 │   ├── main.py                         # Entry point + schedulers (cycles)
 │   ├── quant_server.py                 # HTTP Micro-server on-demand (port 8000/8080)
@@ -73,26 +73,25 @@ cryptocapi-refactor/
 │   ├── src/
 │   │   ├── core/                       # App init, router, events, domain (DDD),
 │   │   │                               #   agentCatalog (.well-known), sitemapRoutes
-│   │   ├── features/                   # access, api, api-management, auth, community,
-│   │   │                               #   docs, home, market, methodology, portfolio,
+│   │   ├── features/                   # access, api, api-management, auth, docs,
+│   │   │                               #   home, market, methodology, portfolio,
 │   │   │                               #   precios, search, status, shared
 │   │   ├── services/                   # API layer + Firebase (auth, firestore)
 │   │   ├── shared/                     # UI components, utils (formatters, state, EventBus)
 │   │   ├── config/                     # Endpoints, constants
 │   │   ├── types/                      # TypeScript definitions
 │   │   └── css/                        # Tailwind + custom CSS
-│   ├── scripts/                        # generate-agent-mirror (.md mirror, per deploy)
+│   ├── scripts/                        # generate-agent-mirror (.md mirror and sitemap.xml, per deploy)
 │   ├── tests/                          # Playwright E2E tests
-│   ├── public/                         # Static assets + llms.txt, robots.txt, sitemap.xml
+│   ├── public/                         # Static assets + llms.txt, robots.txt
 │   └── vite.config.js / playwright.config.js
 │
 ├── 📂 shared/                          # 🔗 Shared contracts (source of truth)
 │   ├── schemas/                        # Zod: asset, market, quant, response (AuditTrail)
 │   ├── types/                          # contracts.ts, models.ts (DTOs Frontend <=> Backend)
 │   ├── utils/                          # configLoader.ts
+│   ├── fixtures/                       # Sello real compartido: Python sella, TypeScript verifica
 │   └── config.json                     # Shared configuration values
-│
-├── 📂 functions/                       # Firebase Cloud Functions (index.js)
 │
 ├── 📂 infra/                           # 🏗️ Infrastructure and deployment
 │   ├── deploy.ps1                      # Multi-service deployment script
@@ -110,10 +109,10 @@ cryptocapi-refactor/
 │
 └── 📂 .github/                         # 🛠️ Configuración y automatizaciones de GitHub
     ├── 📂 workflows/                   # Recetas/instrucciones de GitHub Actions (CI/CD)
-    │   ├── quality-gate.yml            # Orquestador del Quality Gate (linters, tipos, tests)
+    │   ├── quality-gate.yml            # Orquestador del Quality Gate (linters, tipos, tests, seguridad)
+    │   ├── auto-merge-develop.yml      # Lleva develop a main cuando el Quality Gate pasa
     │   ├── playwright.yml              # Automatización de pruebas E2E del frontend
-    │   ├── deploy.yml                  # Automatización del deploy a GCP Cloud Run/Hosting
-    │   └── setup-branch-protection.yml # Automatización de políticas de protección de ramas
+    │   └── deploy.yml                  # Deploy a GCP Cloud Run y Firebase Hosting
     ├── dependabot.yml                  # Alertas y actualización automática de librerías
     └── copilot-instructions.md         # Reglas de contexto y comportamiento para Copilot
 ```

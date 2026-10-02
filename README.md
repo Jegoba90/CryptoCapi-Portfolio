@@ -9,7 +9,7 @@
 
 
 
-Plataforma de análisis de criptomonedas con tres motores especializados, dos puramente matemáticos, uno con IA auditada por Python para que los números nunca mientan.
+Plataforma de análisis de criptomonedas con cuatro motores especializados: tres puramente matemáticos y uno con IA auditada por Python, para que los números nunca mientan.
 
 <br/>
 
@@ -34,9 +34,9 @@ Plataforma de análisis de criptomonedas con tres motores especializados, dos pu
 ## 📋 Tabla de Contenidos
 
 - [El problema que resolvemos](#-el-problema-que-resolvemos)
-- [Arquitectura · Tres Motores Especializados](#-arquitectura--tres-motores-especializados)
+- [Arquitectura · Cuatro Motores Especializados](#-arquitectura--cuatro-motores-especializados)
 - [Pipeline Anti-Alucinación · Defensa en 4 Capas](#️-pipeline-anti-alucinación--defensa-en-4-capas)
-- [Pruébalo ahora](#-pruébalo-ahora)
+- [Probalo ahora](#-probalo-ahora)
 - [Stack Tecnológico Completo](#️-stack-tecnológico-completo)
 - [Flujo de Datos](#-flujo-de-datos)
 - [Principios de Ingeniería](#️-principios-de-ingeniería)
@@ -52,24 +52,25 @@ Plataforma de análisis de criptomonedas con tres motores especializados, dos pu
 > Los modelos de lenguaje **alucinan**. En finanzas, una alucinación cuesta dinero real.
 
 CryptoCapi resuelve esto con una arquitectura donde la **IA solo interpreta narrativa** (noticias, sentimiento)
-y **toda decisión numérica la calcula matemática verificable** — Z-Scores, filtros de Kalman, exponentes de
+y **toda decisión numérica la calcula matemática verificable**: Z-Scores, filtros de Kalman, exponentes de
 Lyapunov y datos on-chain leídos directamente de la blockchain.
 
 <div align="center">
 
-**No te decimos qué comprar. Te damos la matemática pura para que tú decidas.**
+**No te decimos qué comprar. Te damos la matemática pura para que decidas vos.**
 
 </div>
 
 ---
 
-## 🧠 Arquitectura · Tres Motores Especializados
+## 🧠 Arquitectura · Cuatro Motores Especializados
 
 | Motor | Rol | Tecnología clave |
 |:---|:---|:---|
 | 📡 **Motor Radar** | Ingesta seis fuentes RSS verificadas (Cointelegraph, CoinDesk, Decrypt, The Block, Bitcoin Magazine, CryptoSlate) y genera sentimiento + resúmenes ejecutivos sin sensacionalismo. Cada fuente entra con su tier de credibilidad, y la matemática determinista valida o invalida la narrativa antes de publicarla. | `Python` · `LLM engine (multi-model)` · `feedparser` · `BeautifulSoup` |
 | 📊 **Motor Quant PRO** | Señal cuantitativa on-demand sobre cualquier par de Binance: filtro de Kalman adaptativo para reducir ruido, exponente de Lyapunov para detectar caos de mercado y Matriz de Intercepción de Régimen (MIR) dual-timeframe 1D/4H. | `NumPy` · `SciPy` · `Pandas` · `TA-Lib` · `Binance REST` |
 | 📈 **Motor Quant Plus** | Señales estadísticas pre-computadas sobre 50 períodos: Z-Score logarítmico con umbral t-Student (α=0.001 del modelo; con precios reales de cripto se cruza cerca de 1 de cada 75 días por moneda), enriquecimiento on-chain vía RPC (congestión de red, actividad de ballenas) e insight accionable con sello SHA-256 reproducible. | `NumPy` · `SciPy` · `Pydantic` · `Mempool RPC` |
+| 🧭 **Motor Market Scan** | Ranking del universo curado por fuerza de señal, armado sobre las señales de Quant Plus. Deja fuera a las stablecoins mientras aguantan la paridad: si una se despega, vuelve al ranking, porque un *depeg* es una señal. | `TypeScript` · `PostgreSQL` |
 
 ### Cobertura por motor
 
@@ -78,6 +79,7 @@ Lyapunov y datos on-chain leídos directamente de la blockchain.
 | 📡 Radar | ~15 monedas curadas | Pre-computado (scheduler) | < 100 ms |
 | 📊 Quant PRO | Cualquier par USDT de Binance | On-demand por request | ~2-3 s |
 | 📈 Quant Plus | ~15 monedas curadas | Pre-computado (scheduler) | < 100 ms |
+| 🧭 Market Scan | Universo curado de Quant Plus | Lee las señales de Quant Plus | < 100 ms |
 
 > Las ~15 monedas curadas incluyen 10 fijas (BTC, ETH, SOL, BNB, XRP, DOGE, TRX, USDT, USDC, LEO) más hasta 5 adicionales seleccionadas dinámicamente por volatilidad ≥ 5% en 24h del top 20 por market cap.
 
@@ -94,13 +96,13 @@ Lyapunov y datos on-chain leídos directamente de la blockchain.
 | **3 · Override numérico** | Tras la respuesta del LLM, Python **sobrescribe** métricas, sentiment y confidence con los valores deterministas. |
 | **4 · Filtrado léxico** | Filtros deterministas eliminan frases alucinadas que sobrevivieron al prompt, usando *gates* basados en Z-Score y sentiment. |
 
-**Umbrales inmutables:** cambios de volatilidad extrema o rupturas de bandas estadísticas disparan alertas automáticas. Anomalías de mercado se detectan mediante umbrales de Z-Score calibrados sobre datos históricos.
+**Umbrales fijos y a la vista:** cambios de volatilidad extrema o rupturas de bandas estadísticas disparan alertas automáticas. Una anomalía se declara cuando el Z-Score cruza el valor crítico de la t de Student (3,5051 con 48 grados de libertad), y ese umbral viaja en cada respuesta PRO como `z_score_threshold`.
 
 La resiliencia de IA se apoya en **cadenas de fallback multi-modelo sobre buckets de cuota independientes** con *backoff* exponencial, de modo que ningún motor agote la capacidad de otro.
 
 ---
 
-## 🚀 Pruébalo ahora
+## 🚀 Probalo ahora
 
 **Sin registro.** La demo key pública (limitada a BTC y ETH, 30 req/hora por IP) devuelve el payload Alpha completo, sello `audit_trail` incluido:
 
@@ -136,7 +138,7 @@ curl -H "x-api-key: demo_btc_eth_public" \
 ![Swagger](https://img.shields.io/badge/OpenAPI-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
 ![Sentry](https://img.shields.io/badge/Sentry-362D59?style=for-the-badge&logo=sentry&logoColor=white)
 
-> `Helmet` · `CORS` · `express-rate-limit` · `compression` · `bcryptjs` · `Pino` (logging) · `email transaccional` · `yahoo-finance2` · `Zod` (validación end-to-end)
+> `Helmet` · `CORS` · `express-rate-limit` · `compression` · `bcryptjs` · `Pino` (logging) · `email transaccional` · `Zod` (validación end-to-end)
 
 ### 🐍 Motor Cuantitativo (Python · Data Science)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
@@ -145,7 +147,7 @@ curl -H "x-api-key: demo_btc_eth_public" \
 ![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
 ![Pydantic](https://img.shields.io/badge/Pydantic-E92063?style=for-the-badge&logo=pydantic&logoColor=white)
 
-> `TA-Lib` (análisis técnico) · `LLM engine (multi-model)` · `Web3` · `Web3 data provider` · `feedparser` · `BeautifulSoup4` · `cloudscraper` · `WebSockets` · `APScheduler`
+> `TA-Lib` (análisis técnico) · `LLM engine (multi-model)` · `feedparser` · `BeautifulSoup4` · `cloudscraper` · `WebSockets` · `APScheduler`
 
 ### 🗄️ Datos & Persistencia
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
@@ -160,7 +162,7 @@ curl -H "x-api-key: demo_btc_eth_public" \
 ![Firebase](https://img.shields.io/badge/Firebase_Hosting-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 
-> Despliegue multi-servicio containerizado · `Docker Compose` (dev/staging/prod) · `Cloud Functions` · Container Registry
+> Despliegue multi-servicio containerizado · `Docker Compose` (dev/staging/prod) · Container Registry
 
 ### ✅ Calidad & Testing
 ![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)
@@ -171,7 +173,7 @@ curl -H "x-api-key: demo_btc_eth_public" \
 ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?style=for-the-badge&logo=prettier&logoColor=black)
 ![Ruff](https://img.shields.io/badge/Ruff-D7FF64?style=for-the-badge&logo=ruff&logoColor=black)
 
-> Tipado estricto verificado con `Mypy` · `Pyright` · `type-coverage` · análisis de código muerto con `ts-prune`
+> Tipado estricto verificado con `Mypy` · `Pyright` · `type-coverage` · análisis de código muerto con `knip`
 
 ---
 
@@ -192,7 +194,7 @@ curl -H "x-api-key: demo_btc_eth_public" \
 
 El monorepo está organizado de forma clara y modular, separando la interfaz de usuario (Vite), la API (Node) y los servicios de recopilación/análisis cuantitativo (Python).
 
-Conoce la distribución detallada de archivos y carpetas de cada módulo en el mapa de directorios:
+Conocé la distribución detallada de archivos y carpetas de cada módulo en el mapa de directorios:
 👉 **[Mapa Detallado de Estructura del Proyecto (docs/project-structure.md)](docs/project-structure.md)**
 
 ---
@@ -201,31 +203,30 @@ Conoce la distribución detallada de archivos y carpetas de cada módulo en el m
 
 > Reglas constitucionales que todo Pull Request debe cumplir.
 
-- **Zero-Any** — prohibido `any` en TypeScript y Python; lo desconocido es `unknown` + *type guards*.
-- **Tipos opacos de dominio** — `CoinId`, `WalletId` y `TransactionId` nunca son `string` planos; el compilador rechaza pasar un ID donde se espera otro, eliminando en compilación la clase entera de bugs "usé el identificador equivocado".
-- **Exhaustividad verificada por el compilador** — todo `switch` sobre una unión discriminada cierra con `assertNever`; añadir un caso nuevo y olvidar manejarlo rompe el build señalando archivo y línea — nunca producción.
-- **Arquitectura Hexagonal** — el dominio nunca depende de la infraestructura; cambiar la base de datos no toca la lógica de negocio.
-- **Contratos compartidos** — única fuente de verdad de tipos entre frontend y backend; nadie adivina la forma de la API.
-- **Cronometría determinista** — `Temporal` API (ES2025) en lugar de `Date` nativo; sin errores de zona horaria/DST en software financiero.
-- **Validación paranoica** — `Zod .strict()` por defecto en el backend + `Pydantic` en el collector; `.passthrough()` permitido solo en fronteras de confianza documentadas (engine interno, proveedor externo, config de infraestructura), nunca en entrada de usuario; validación bilateral antes de persistir.
-- **Sello criptográfico verificable** — cada motor firma sus resultados con un `protocol_hash` SHA-256 sobre inputs/outputs deterministas; alterar cualquier campo cubierto invalida el sello (*tamper-evidence*). Semántica honesta por motor: `reproducible` (recalculable sin dependencias), `output_seal` (re-verificable contra el origen) y `process_seal` (certifica el proceso, no el texto del LLM).
-- **Value Objects** — el dinero nunca es un `number` crudo; se encapsula inmutable para impedir estados inválidos.
-- **Dependencias por arquetipo** — el motor ligero calcula sin NumPy; solo el Quant Engine carga NumPy/Kalman → imágenes Docker mínimas.
-- **Gestión explícita de recursos** — `using` / `await using` (ES2025) cierran las conexiones serverless automáticamente y evitan fugas.
-- **Cache-First** — Redis gestionado con TTL delante de PostgreSQL en todo `GET` público.
-- **Degradación honesta** — en modo *fallback*, la confianza reportada nunca es `HIGH`.
-- **Type-safe de extremo a extremo** — verificado con `Mypy`, `Pyright` y `type-coverage`.
-- **Quality Gate en CI** — GitHub Actions corre tipos, linters, tests (Jest/Pytest) y E2E (Playwright) en cada push.
-- **Seguridad & observabilidad** — `Helmet`, rate limiting, sanitización XSS (DOMPurify), `bcrypt`; error monitoring y logs estructurados.
+- **Zero-Any**: prohibido `any` en TypeScript y Python; lo desconocido es `unknown` + *type guards*.
+- **Tipos opacos de dominio**: `CoinId`, `WalletId` y `TransactionId` nunca son `string` planos; el compilador rechaza pasar un ID donde se espera otro, eliminando en compilación la clase entera de bugs "usé el identificador equivocado".
+- **Exhaustividad verificada por el compilador**: todo `switch` sobre una unión discriminada cierra con `assertNever`; añadir un caso nuevo y olvidar manejarlo rompe el build señalando archivo y línea, nunca en producción.
+- **Arquitectura Hexagonal**: el dominio nunca depende de la infraestructura; cambiar la base de datos no toca la lógica de negocio.
+- **Contratos compartidos**: única fuente de verdad de tipos entre frontend y backend; nadie adivina la forma de la API.
+- **Cronometría determinista**: `Temporal` API en lugar de `Date` nativo; sin errores de zona horaria/DST en software financiero.
+- **Validación paranoica**: `Zod .strict()` por defecto en el backend + `Pydantic` en el collector; `.passthrough()` permitido solo en fronteras de confianza documentadas (engine interno, proveedor externo, config de infraestructura), nunca en entrada de usuario; validación bilateral antes de persistir.
+- **Sello criptográfico verificable**: cada motor firma sus resultados con un `protocol_hash` SHA-256 sobre inputs/outputs deterministas; alterar cualquier campo cubierto invalida el sello (*tamper-evidence*). Semántica honesta por motor: `reproducible` (recalculable sin dependencias), `output_seal` (re-verificable contra el origen) y `process_seal` (certifica el proceso, no el texto del LLM).
+- **Value Objects**: el dinero nunca es un `number` crudo; se encapsula inmutable para impedir estados inválidos.
+- **Gestión explícita de recursos**: `using` / `await using` cierran las conexiones serverless automáticamente y evitan fugas.
+- **Cache-First**: Redis gestionado con TTL delante de PostgreSQL en todo `GET` público.
+- **Degradación honesta**: en modo *fallback*, la confianza reportada nunca es `HIGH`.
+- **Type-safe de extremo a extremo**: verificado con `Mypy`, `Pyright` y `type-coverage`.
+- **Quality Gate en CI**: GitHub Actions corre tipos, linters, tests (Jest, Vitest, Pytest), auditoría de dependencias y escaneo de secretos en cada push.
+- **Seguridad & observabilidad**: `Helmet`, rate limiting, sanitización XSS (DOMPurify), `bcrypt`; error monitoring y logs estructurados.
 
 ---
 
 ## 🔬 Outputs de ejemplo · Qué devuelve cada motor
 
-> Respuestas reales del sistema sobre **BTC**. Radar capturado el **2026-09-03** con la demo key pública; Quant PRO y Quant Plus, el **2026-05-25**. Los pesos internos de los indicadores no se publican.
+> Respuestas reales del sistema sobre **BTC**. Radar capturado el **2026-09-03** con la demo key pública; Quant Plus, el **2026-09-01**; Quant PRO, el **2026-05-25**. Son anteriores a `v2.3.0` (2026-10-01): los dos sellos dicen su `engine_version`, y [SEAL.md](docs/SEAL.md) explica qué regla aplica a cada versión. Los pesos internos de los indicadores no se publican.
 
 <details>
-<summary>📡 Motor Radar — Sentimiento sobre fuentes verificadas · sello audit_trail</summary>
+<summary>📡 Motor Radar · Sentimiento sobre fuentes verificadas · sello audit_trail</summary>
 
 ```json
 {
@@ -293,12 +294,12 @@ Conoce la distribución detallada de archivos y carpetas de cada módulo en el m
 }
 ```
 
-> El `audit_trail` declara qué corrigió Python sobre la salida del LLM: `fields_overridden` lista los campos sobrescritos con valores deterministas y `filters_applied`, los filtros léxicos que se dispararon — en esta captura saltó uno, `LEY 7 volume`, y el pipeline llegó a reescribir el propio `detailed_report`. Cómo verificar el hash: [SEAL.md](docs/SEAL.md). La respuesta va entera, sin recortar, y está commiteada tal cual en [api/examples/radar-alpha.json](api/examples/radar-alpha.json).
+> El `audit_trail` declara qué corrigió Python sobre la salida del LLM: `fields_overridden` lista los campos sobrescritos con valores deterministas y `filters_applied`, los filtros léxicos que se dispararon. En esta captura saltó uno, `LEY 7 volume`, y el pipeline llegó a reescribir el propio `detailed_report`. Cómo verificar el hash: [SEAL.md](docs/SEAL.md). La respuesta va entera, sin recortar, y está commiteada tal cual en [api/examples/radar-alpha.json](api/examples/radar-alpha.json).
 
 </details>
 
 <details>
-<summary>📊 Motor Quant PRO — Análisis cuantitativo multi-timeframe</summary>
+<summary>📊 Motor Quant PRO · Análisis cuantitativo multi-timeframe</summary>
 
 ```json
 {
@@ -341,7 +342,7 @@ Conoce la distribución detallada de archivos y carpetas de cada módulo en el m
 </details>
 
 <details>
-<summary>⛓️ Motor Quant Plus — Sello reproducible y datos on-chain</summary>
+<summary>⛓️ Motor Quant Plus · Sello reproducible y datos on-chain</summary>
 
 Este es el motor cuyo sello **podés recalcular vos**. El vector de entrada abajo viene abreviado para que se lea; la respuesta completa, con sus 51 precios y sus 51 marcas de tiempo, está commiteada en [`api/examples/quant-plus-signal.json`](api/examples/quant-plus-signal.json), y **ese archivo verifica**: seguí los pasos de [docs/SEAL.md](docs/SEAL.md) y vas a obtener el mismo hash.
 
@@ -469,6 +470,10 @@ curl https://www.cryptocapi.com/docs/agentes.md
 | Portada | [`/.md`](https://www.cryptocapi.com/.md) |
 | Referencia del API | [`/docs/api.md`](https://www.cryptocapi.com/docs/api.md) |
 | Guía de IA y agentes | [`/docs/agentes.md`](https://www.cryptocapi.com/docs/agentes.md) |
+| Documentación | [`/docs.md`](https://www.cryptocapi.com/docs.md) |
+| Metodología y verificación del sello | [`/methodology.md`](https://www.cryptocapi.com/methodology.md) |
+| Términos | [`/terms.md`](https://www.cryptocapi.com/terms.md) |
+| Privacidad | [`/privacy.md`](https://www.cryptocapi.com/privacy.md) |
 
 > **Ramificá por el `Content-Type`, no por el código de estado.** Una URL `.md` sin espejo devuelve **200 con el cascarón HTML**, así que `text/markdown` es la única señal fiable de que el espejo existe. Es el error más fácil de cometer contra esta superficie, y por eso está escrito acá.
 
@@ -497,7 +502,7 @@ Para clientes que no hablan MCP, el archivo [`llms.txt`](https://www.cryptocapi.
 
 **Funciona donde construyas:** Claude Code · Cursor · GitHub Copilot · ChatGPT · LangChain · cualquier cliente REST.
 
-¿Quieres verlo funcionando? El agente open source [anti-hallucination-crypto-agent](https://github.com/Jegoba90/anti-hallucination-crypto-agent) consume este API en vivo y verifica el sello por su cuenta. Es el ejemplo ejecutable de todo lo anterior.
+¿Querés verlo funcionando? El agente open source [anti-hallucination-crypto-agent](https://github.com/Jegoba90/anti-hallucination-crypto-agent) consume este API en vivo y verifica el sello por su cuenta. Es el ejemplo ejecutable de todo lo anterior.
 
 ---
 
@@ -506,7 +511,7 @@ Para clientes que no hablan MCP, el archivo [`llms.txt`](https://www.cryptocapi.
 ## 💜 Filosofía
 
 > ### *"Nosotros no te decimos qué comprar.*
-> ### *Te damos la matemática pura para que tú decidas."*
+> ### *Te damos la matemática pura para que decidas vos."*
 
 <br/>
 
