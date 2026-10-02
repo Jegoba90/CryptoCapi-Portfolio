@@ -3,6 +3,7 @@ import {
   AssetIdentitySchema,
   ConfidenceSchema,
   EnvelopeSchema,
+  MathDiagnosticsSchema,
   SentimentEnum,
 } from './shared.schema';
 
@@ -14,23 +15,12 @@ const SourceSchema = z.object({
   credibility: z.enum(['Tier 1', 'Tier 2', 'Tier 3']),
 });
 
-// ── Math diagnostics (PRO only) ──────────────────────────────────────────────
-
-const RadarMathDiagnosticsSchema = z.object({
-  z_score: z.number(),
-  bollinger_bandwidth: z.number(),
-  market_regime: z.string(),
-  extreme_volatility_detected: z.boolean(),
-  data_quality: z.enum(['OPTIMAL', 'PARTIAL', 'INSUFFICIENT']),
-  sentiment_override: z.boolean(),
-  anomaly_details: z.string().nullable(),
-});
-
 // ── Pulse view (FREE) ────────────────────────────────────────────────────────
 
 const RadarPulseDataSchema = z.object({
   engine_used: z.literal('radar'),
   asset: AssetIdentitySchema,
+  generated_at: z.string(),
   summary: z.string(),
   sentiment: SentimentEnum,
   statistical_anomaly_detected: z.boolean(),
@@ -41,15 +31,17 @@ export const RadarPulseResponseSchema = EnvelopeSchema.extend({
 });
 
 // ── Alpha view (PRO) ─────────────────────────────────────────────────────────
+// `math_diagnostics.audit_trail` is the `process_seal`.
 
 const RadarAlphaDataSchema = z.object({
   engine_used: z.literal('radar'),
   asset: AssetIdentitySchema,
+  generated_at: z.string(),
   summary: z.string(),
   sentiment: SentimentEnum,
   statistical_anomaly_detected: z.boolean(),
   confidence: ConfidenceSchema,
-  math_diagnostics: RadarMathDiagnosticsSchema,
+  math_diagnostics: MathDiagnosticsSchema,
   analysis: z.object({
     detailed_report: z.string(),
     sources_verified: z.array(SourceSchema),

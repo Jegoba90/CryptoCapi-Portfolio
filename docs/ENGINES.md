@@ -1,17 +1,17 @@
 # Engines — CryptoCapi API v1
 
-CryptoCapi exposes four analytical engines. Each targets a different use case and execution model. All four require a **PRO API key** (`sk_live_…`).
+CryptoCapi exposes four analytical engines. Each targets a different use case and execution model, and each one is sold as its own pass: a key that holds one engine does not open the others (see [Entitlement](AUTHENTICATION.md#entitlement-one-pass-per-engine)). The public demo key opens Radar and Quant Plus for `bitcoin` and `ethereum`, with no signup.
 
 ---
 
 ## Engine Overview
 
-| Engine | Execution | Universe | Latency | Plan |
+| Engine | Execution | Universe | Latency | Pass |
 |---|---|---|---|---|
-| **Radar** | Pre-computed (scheduler) | ~15 coins | < 100 ms | PRO |
-| **Quant Plus** | Pre-computed (scheduler) | ~15 coins | < 100 ms | PRO |
-| **Quant Pro** | On-demand per request | Any Binance USDT pair | ~2–3 s | PRO |
-| **Market Scanner** | On-demand (reads Quant Plus signals) | All coins scored by Quant Plus | < 100 ms | PRO |
+| **Radar** | Pre-computed (scheduler) | ~15 coins | < 100 ms | `alpha` (the Pulse view is free) |
+| **Quant Plus** | Pre-computed (scheduler) | ~15 coins | < 100 ms | `quant_plus` |
+| **Quant Pro** | On-demand per request | Any Binance USDT pair | ~2–3 s | `quant` |
+| **Market Scanner** | On-demand (reads Quant Plus signals) | All coins scored by Quant Plus | < 100 ms | `market_scan` |
 
 ---
 
@@ -20,16 +20,16 @@ CryptoCapi exposes four analytical engines. Each targets a different use case an
 **What it does:** Delivers AI-generated market intelligence for each asset in the scheduled universe. For every coin, Radar produces a natural-language analysis, a sentiment label, and a confidence score — with all numeric claims mathematically verified before delivery (see [SEAL.md](SEAL.md)).
 
 **Output includes:**
-- `summary` — concise directional take (1–2 sentences)
-- `detailed_report` — structured narrative (max 150 words)
-- `sentiment` — `bullish` | `bearish` | `neutral`
-- `market_regime` — structural regime: `BULLISH_TREND`, `BEARISH_TREND`, `RANGING_CHOP`, `EXTREME_VOLATILITY`, `UNUSUAL_VOLATILITY`
-- `confidence` — `HIGH` / `MEDIUM` / `LOW` with a numeric score (`0.0–1.0`)
-- `sources_verified` — news sources with credibility tier (`Tier 1`–`3`); empty array means no news met relevance thresholds (not an error)
-- `math_diagnostics.audit_trail` — `process_seal` SHA-256 hash certifying which mathematical corrections were applied
+- `summary`: concise directional take (1–2 sentences)
+- `detailed_report`: structured narrative (max 150 words)
+- `sentiment`: `bullish` | `bearish` | `neutral`
+- `market_regime`: structural regime: `BULLISH_TREND`, `BEARISH_TREND`, `RANGING_CHOP`, `EXTREME_VOLATILITY`, `UNUSUAL_VOLATILITY`
+- `confidence`: `HIGH` / `MEDIUM` / `LOW` with a numeric score (`0.0–1.0`)
+- `sources_verified`: news sources with credibility tier (`Tier 1`–`3`); empty array means no news met relevance thresholds (not an error)
+- `math_diagnostics.audit_trail`: `process_seal` SHA-256 hash certifying which mathematical corrections were applied
 
-**Endpoint:** `GET /market/insights/:id`
-(`id` = CoinGecko slug, e.g. `bitcoin`, `ethereum`)
+**Endpoint:** `GET /market/insights/:id?view=alpha`
+(`id` = CoinGecko slug, e.g. `bitcoin`, `ethereum`). Without `view=alpha` the route answers the free Pulse view, with no diagnostics and no seal.
 
 > **Note on `sources_verified: []`:** An empty sources array is a deliberate signal, not missing data. It means no news from the last window influenced the asset — the analysis is based purely on price action.
 
@@ -40,15 +40,16 @@ CryptoCapi exposes four analytical engines. Each targets a different use case an
 **What it does:** Produces a fully deterministic quantitative signal for each asset in the scheduled universe. No AI is involved — every output field is computed by Python from historical price data.
 
 **Output includes:**
-- `signal` — `BUY` | `SELL` | `HOLD`
-- `sentiment` — numeric score and label
-- `market_regime` — same 5-regime taxonomy as Radar
-- `confidence` — deterministic score based on data coverage and volatility
-- `math_diagnostics.audit_trail` — `reproducible` SHA-256 hash: includes the input price vector, so third parties can independently recompute the result and verify it matches (see [SEAL.md](SEAL.md))
+- `actionable_insight.signal`: `BUY_WATCH` | `SELL_WATCH` | `ALERT` | `HOLD`, with its `risk_level` (`LOW` | `MEDIUM` | `HIGH`) and the `trigger_condition` that explains it
+- `sentiment`: `bullish` | `bearish` | `neutral`
+- `market_regime`: same 5-regime taxonomy as Radar
+- `confidence`: deterministic `score` and `label`, from data coverage and volatility, lowered when the on-chain read is unavailable
+- `onchain_stats`: network congestion, whale activity and how reliable the on-chain read was
+- `math_diagnostics.audit_trail`: `reproducible` SHA-256 hash. It includes the input price vector, so third parties can independently recompute the result and verify it matches (see [SEAL.md](SEAL.md))
 
 **Endpoints:**
-- `GET /quant/:symbol/signal` — single asset signal (pass CoinGecko slug, e.g. `bitcoin`)
-- `POST /quant/batch` — signals for multiple assets in one request
+- `GET /quant-plus/:id/signal?view=alpha`: single asset signal (`id` = CoinGecko slug, e.g. `bitcoin`). Same payload as `GET /market/insights/:id?engine=quant_plus&view=alpha`. Without `view=alpha`, both answer the free Pulse view.
+- `POST /quant/batch`: signals for up to 50 assets in one request
 
 ```json
 // POST /quant/batch body
@@ -62,11 +63,11 @@ CryptoCapi exposes four analytical engines. Each targets a different use case an
 **What it does:** Runs a live dual-timeframe quantitative analysis on any Binance USDT pair, on demand. Fetches real candle data at request time and computes the signal immediately — no pre-computation, no universe restriction.
 
 **Output includes:**
-- `final_signal` — `BUY` | `SELL` | `HOLD`
-- `final_score` — composite signal strength (`0–100`)
-- Per-timeframe breakdown (1D and 4H): individual indicator scores, confluence score
-- `MIR diagnostics` — market instability read
-- `audit_trail` — `output_seal` SHA-256 hash: tamper-evident seal over all deterministic outputs; any alteration of the response invalidates the hash (see [SEAL.md](SEAL.md))
+- `resolved_signal`: `STRONG_BUY` | `BUY` | `NEUTRAL_CHOP` | `SELL` | `STRONG_SELL`
+- `resolved_score`: composite signal strength (`0–100`)
+- `macro_1d` and `micro_4h`: per-timeframe breakdown with individual indicator scores, confluence score, signal and regime read
+- `mir_diagnostics`: how the regime read adjusted the score (`base_raw_score`, `chaos_penalty_applied`, `explanation`)
+- `audit_trail`: `output_seal` SHA-256 hash: tamper-evident seal over all deterministic outputs; any alteration of the response invalidates the hash (see [SEAL.md](SEAL.md))
 
 **Endpoint:** `GET /quant/:symbol/signal`
 (`symbol` = Binance pair in uppercase, e.g. `BTCUSDT`, `ETHUSDT`, `SOLUSDT`)
@@ -82,12 +83,13 @@ CryptoCapi exposes four analytical engines. Each targets a different use case an
 **Output includes:**
 - Ranked array of assets with signal, score, and regime
 - Filtered to assets with a Quant Plus signal fresher than 24 hours
+- Stablecoins are left out while they hold their peg. One that moves more than 1% in 24 hours comes back into the ranking, because a depeg is a signal
 
 **Query parameters:**
 | Param | Values | Default |
 |---|---|---|
 | `strategy` | `balanced` \| `aggressive` \| `conservative` | `balanced` |
-| `limit` | number | `10` |
+| `limit` | `1`–`50` | `10` |
 
 **Endpoint:** `GET /quant/market-scan`
 
@@ -95,7 +97,7 @@ CryptoCapi exposes four analytical engines. Each targets a different use case an
 
 ## Coin Universe (Radar & Quant Plus)
 
-The scheduler runs continuously on a fixed core of **10 coins**, plus up to **5 volatile additions** from the top 20 by market cap (≥ 5% price change in 24h), deduplicated.
+The collector runs every hour over a fixed core of **10 coins**, plus up to **5 volatile additions** from the top 20 by market cap (≥ 5% price change in 24h), deduplicated.
 
 **Fixed core (always included):**
 
@@ -107,6 +109,8 @@ The scheduler runs continuously on a fixed core of **10 coins**, plus up to **5 
 **Volatile additions:** up to 5 coins from the top 20 that moved ≥ 5% in the last 24h. The set changes each scheduler cycle.
 
 **Update frequency:** Priority coins (BTC, ETH, BNB, SOL, USDT) refresh every **2 hours**. All others refresh every **4 hours**.
+
+**Data window:** the Z-Score and the Bollinger bands use the last 51 closed daily candles (UTC) from Yahoo Finance. Since engine `v2.3.0` (`v2.3.0-math` and `v2.3.0-radar`) the day in progress is never part of the series, so the last date in `input_timestamps` is a complete day, not today.
 
 ---
 
