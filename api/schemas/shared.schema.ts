@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-// Response shapes of the CryptoCapi API v1, as of engine v2.3.0 (2026-10-01).
+// Response shapes of the CryptoCapi API v1, as of engines v2.3.0 (Radar and
+// Quant Plus, 2026-10-01) and v1.2.0-quant (Quant Pro, 2026-10-03).
 // They are not strict: a field the API adds later does not break a client that
 // validates with them.
 

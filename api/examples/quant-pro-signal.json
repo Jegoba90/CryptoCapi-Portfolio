@@ -1,35 +1,56 @@
 {
   "status": "success",
   "version": "1.0.0",
-  "timestamp": "2026-05-25T20:18:36.005Z",
+  "timestamp": "2026-10-03T14:51:37.356Z",
   "data": {
-    "asset": { "id": "bitcoin", "symbol": "BTC" },
-    "resolved_signal": "NEUTRAL_CHOP",
-    "resolved_score": 52,
+    "asset": {
+      "id": "btc",
+      "symbol": "BTCUSDT"
+    },
+    "symbol": "BTCUSDT",
+    "resolved_signal": "BUY",
+    "resolved_score": 65,
     "mir_diagnostics": {
-      "base_raw_score": 55,
-      "chaos_penalty_applied": true,
-      "explanation": "Convicción direccional contraída por régimen de caos sistémico detectado."
+      "base_raw_score": 65,
+      "insufficient_data": false,
+      "conviction_multiplier": 1,
+      "explanation": "Sin contracción de convicción: las dos temporalidades tienen al menos 50 velas."
     },
     "macro_1d": {
       "timeframe": "1d",
-      "confluence_score": 55,
-      "signal": "NEUTRAL_CHOP",
-      "regime": {
-        "lyapunov": 1.893,
-        "status": "CHAOTIC",
-        "signal_confidence": "LOW"
-      }
+      "confluence_score": 65,
+      "signal": "BUY",
+      "indicators": {
+        "ema_cross_score": 30,
+        "rsi_score": 20,
+        "macd_score": 0,
+        "bollinger_score": 0,
+        "kalman_score": 15
+      },
+      "candle_count": 500,
+      "timestamp": "2026-10-03T14:51:36.832706Z"
     },
     "micro_4h": {
       "timeframe": "4h",
-      "confluence_score": 60,
+      "confluence_score": 55,
       "signal": "NEUTRAL_CHOP",
-      "regime": {
-        "lyapunov": 2.031,
-        "status": "CHAOTIC",
-        "signal_confidence": "LOW"
-      }
+      "indicators": {
+        "ema_cross_score": 30,
+        "rsi_score": 10,
+        "macd_score": 0,
+        "bollinger_score": 0,
+        "kalman_score": 15
+      },
+      "candle_count": 1000,
+      "timestamp": "2026-10-03T14:51:37.356404Z"
+    },
+    "version": "v1.2.0-quant",
+    "audit_trail": {
+      "protocol_hash": "0xbffe1e8746bffdfba216cbff2490d5d077754a2827edddb99656abb90d9e3ab6",
+      "calculated_at": "2026-10-03T14:51:37.356754Z",
+      "algorithm_id": "Kalman-Adaptive + Confluence (Dual-Timeframe MIR)",
+      "engine_version": "v1.2.0-quant",
+      "seal_type": "output_seal"
     }
   }
 }

@@ -52,8 +52,8 @@ Plataforma de análisis de criptomonedas con cuatro motores especializados: tres
 > Los modelos de lenguaje **alucinan**. En finanzas, una alucinación cuesta dinero real.
 
 CryptoCapi resuelve esto con una arquitectura donde la **IA solo interpreta narrativa** (noticias, sentimiento)
-y **toda decisión numérica la calcula matemática verificable**: Z-Scores, filtros de Kalman, exponentes de
-Lyapunov y datos on-chain leídos directamente de la blockchain.
+y **toda decisión numérica la calcula matemática verificable**: Z-Scores, filtros de Kalman, confluencia
+de indicadores técnicos y datos on-chain leídos directamente de la blockchain.
 
 <div align="center">
 
@@ -68,7 +68,7 @@ Lyapunov y datos on-chain leídos directamente de la blockchain.
 | Motor | Rol | Tecnología clave |
 |:---|:---|:---|
 | 📡 **Motor Radar** | Ingesta seis fuentes RSS verificadas (Cointelegraph, CoinDesk, Decrypt, The Block, Bitcoin Magazine, CryptoSlate) y genera sentimiento + resúmenes ejecutivos sin sensacionalismo. Cada fuente entra con su tier de credibilidad, y la matemática determinista valida o invalida la narrativa antes de publicarla. | `Python` · `LLM engine (multi-model)` · `feedparser` · `BeautifulSoup` |
-| 📊 **Motor Quant PRO** | Señal cuantitativa on-demand sobre cualquier par de Binance: filtro de Kalman adaptativo para reducir ruido, exponente de Lyapunov para detectar caos de mercado y Matriz de Intercepción de Régimen (MIR) dual-timeframe 1D/4H. | `NumPy` · `SciPy` · `Pandas` · `TA-Lib` · `Binance REST` |
+| 📊 **Motor Quant PRO** | Señal cuantitativa on-demand sobre cualquier par de Binance: filtro de Kalman adaptativo para reducir ruido, cinco indicadores técnicos y Matriz de Intercepción de Régimen (MIR) dual-timeframe 1D/4H. | `NumPy` · `SciPy` · `Pandas` · `TA-Lib` · `Binance REST` |
 | 📈 **Motor Quant Plus** | Señales estadísticas pre-computadas sobre 50 períodos: Z-Score logarítmico con umbral t-Student (α=0.001 del modelo; con precios reales de cripto se cruza cerca de 1 de cada 75 días por moneda), enriquecimiento on-chain vía RPC (congestión de red, actividad de ballenas) e insight accionable con sello SHA-256 reproducible. | `NumPy` · `SciPy` · `Pydantic` · `Mempool RPC` |
 | 🧭 **Motor Market Scan** | Ranking del universo curado por fuerza de señal, armado sobre las señales de Quant Plus. Deja fuera a las stablecoins mientras aguantan la paridad: si una se despega, vuelve al ranking, porque un *depeg* es una señal. | `TypeScript` · `PostgreSQL` |
 
@@ -223,7 +223,7 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
 
 ## 🔬 Outputs de ejemplo · Qué devuelve cada motor
 
-> Respuestas reales del sistema sobre **BTC**. Radar capturado el **2026-09-03** con la demo key pública; Quant Plus, el **2026-09-01**; Quant PRO, el **2026-05-25**. Son anteriores a `v2.3.0` (2026-10-01): los dos sellos dicen su `engine_version`, y [SEAL.md](docs/SEAL.md) explica qué regla aplica a cada versión. Los pesos internos de los indicadores no se publican.
+> Respuestas reales del sistema sobre **BTC**. Radar capturado el **2026-09-03** con la demo key pública; Quant Plus, el **2026-09-01**; Quant PRO, el **2026-10-03**, salida del motor `v1.2.0-quant` sobre Binance en vivo con el envoltorio del API. Radar y Quant Plus son anteriores a `v2.3.0` (2026-10-01): cada sello dice su `engine_version`, y [SEAL.md](docs/SEAL.md) explica qué regla aplica a cada versión.
 
 <details>
 <summary>📡 Motor Radar · Sentimiento sobre fuentes verificadas · sello audit_trail</summary>
@@ -305,39 +305,62 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
 {
   "status": "success",
   "version": "1.0.0",
-  "timestamp": "2026-05-25T20:18:36.005Z",
+  "timestamp": "2026-10-03T14:51:37.356Z",
   "data": {
-    "asset": { "id": "bitcoin", "symbol": "BTC" },
-    "resolved_signal": "NEUTRAL_CHOP",
-    "resolved_score": 52,
+    "asset": {
+      "id": "btc",
+      "symbol": "BTCUSDT"
+    },
+    "symbol": "BTCUSDT",
+    "resolved_signal": "BUY",
+    "resolved_score": 65,
     "mir_diagnostics": {
-      "base_raw_score": 55,
-      "chaos_penalty_applied": true,
-      "explanation": "Convicción direccional contraída por régimen de caos sistémico detectado."
+      "base_raw_score": 65,
+      "insufficient_data": false,
+      "conviction_multiplier": 1,
+      "explanation": "Sin contracción de convicción: las dos temporalidades tienen al menos 50 velas."
     },
     "macro_1d": {
       "timeframe": "1d",
-      "confluence_score": 55,
-      "signal": "NEUTRAL_CHOP",
-      "regime": {
-        "lyapunov": 1.893,
-        "status": "CHAOTIC",
-        "signal_confidence": "LOW"
-      }
+      "confluence_score": 65,
+      "signal": "BUY",
+      "indicators": {
+        "ema_cross_score": 30,
+        "rsi_score": 20,
+        "macd_score": 0,
+        "bollinger_score": 0,
+        "kalman_score": 15
+      },
+      "candle_count": 500,
+      "timestamp": "2026-10-03T14:51:36.832706Z"
     },
     "micro_4h": {
       "timeframe": "4h",
-      "confluence_score": 60,
+      "confluence_score": 55,
       "signal": "NEUTRAL_CHOP",
-      "regime": {
-        "lyapunov": 2.031,
-        "status": "CHAOTIC",
-        "signal_confidence": "LOW"
-      }
+      "indicators": {
+        "ema_cross_score": 30,
+        "rsi_score": 10,
+        "macd_score": 0,
+        "bollinger_score": 0,
+        "kalman_score": 15
+      },
+      "candle_count": 1000,
+      "timestamp": "2026-10-03T14:51:37.356404Z"
+    },
+    "version": "v1.2.0-quant",
+    "audit_trail": {
+      "protocol_hash": "0xbffe1e8746bffdfba216cbff2490d5d077754a2827edddb99656abb90d9e3ab6",
+      "calculated_at": "2026-10-03T14:51:37.356754Z",
+      "algorithm_id": "Kalman-Adaptive + Confluence (Dual-Timeframe MIR)",
+      "engine_version": "v1.2.0-quant",
+      "seal_type": "output_seal"
     }
   }
 }
 ```
+
+> `resolved_signal` dice cuántos indicadores coinciden: STRONG es una confluencia alta, no una probabilidad ni un pronóstico. Con menos de 50 velas en alguna temporalidad, `mir_diagnostics.insufficient_data` sale en `true` y la distancia del score a 50 se reduce a la mitad. La respuesta va entera en [api/examples/quant-pro-signal.json](api/examples/quant-pro-signal.json).
 
 </details>
 

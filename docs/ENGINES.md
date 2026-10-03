@@ -63,10 +63,10 @@ CryptoCapi exposes four analytical engines. Each targets a different use case an
 **What it does:** Runs a live dual-timeframe quantitative analysis on any Binance USDT pair, on demand. Fetches real candle data at request time and computes the signal immediately — no pre-computation, no universe restriction.
 
 **Output includes:**
-- `resolved_signal`: `STRONG_BUY` | `BUY` | `NEUTRAL_CHOP` | `SELL` | `STRONG_SELL`
+- `resolved_signal`: `STRONG_BUY` (>= 85) | `BUY` (65-84) | `NEUTRAL_CHOP` (35-64) | `SELL` (16-34) | `STRONG_SELL` (< 16). It says how many indicators agree: STRONG is high confluence, not a probability or a forecast
 - `resolved_score`: composite signal strength (`0–100`)
-- `macro_1d` and `micro_4h`: per-timeframe breakdown with individual indicator scores, confluence score, signal and regime read
-- `mir_diagnostics`: how the regime read adjusted the score (`base_raw_score`, `chaos_penalty_applied`, `explanation`)
+- `macro_1d` and `micro_4h`: per-timeframe breakdown with individual indicator scores, confluence score, signal and `candle_count`
+- `mir_diagnostics`: how the two timeframes were resolved (`base_raw_score`) and whether the data fail-safe applied (`insufficient_data`, `conviction_multiplier`): with fewer than 50 candles in either timeframe, the score's distance to 50 is halved. Plus an `explanation`
 - `audit_trail`: `output_seal` SHA-256 hash: tamper-evident seal over all deterministic outputs; any alteration of the response invalidates the hash (see [SEAL.md](SEAL.md))
 
 **Endpoint:** `GET /quant/:symbol/signal`

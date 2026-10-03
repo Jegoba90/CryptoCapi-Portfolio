@@ -1,22 +1,13 @@
 import { z } from 'zod';
 import { AssetIdentitySchema, AuditTrailSchema, EnvelopeSchema, SignalEnum } from './shared.schema';
 
-// ── Market regime ────────────────────────────────────────────────────────────
-
-const MarketRegimeSchema = z.object({
-  lyapunov: z.number(),
-  is_valid: z.boolean(),
-  status: z.enum(['STABLE', 'TRANSITIONAL', 'CHAOTIC']),
-  signal_confidence: z.enum(['HIGH', 'MEDIUM', 'LOW']),
-});
-
 // ── Timeframe block (1D / 4H) ────────────────────────────────────────────────
 
 const ConfluenceBlockSchema = z.object({
   timeframe: z.enum(['4h', '1d']),
   confluence_score: z.number().min(0).max(100),
   signal: SignalEnum,
-  regime: MarketRegimeSchema,
+  candle_count: z.number().int(),
   timestamp: z.string(),
 });
 
@@ -24,8 +15,9 @@ const ConfluenceBlockSchema = z.object({
 
 const MIRDiagnosticsSchema = z.object({
   base_raw_score: z.number(),
-  chaos_penalty_applied: z.boolean(),
-  lyapunov_multiplier: z.number(),
+  // Fewer than 50 candles in either timeframe: the score's distance to 50 is halved.
+  insufficient_data: z.boolean(),
+  conviction_multiplier: z.number(),
   explanation: z.string(),
 });
 
