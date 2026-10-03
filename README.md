@@ -223,7 +223,7 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
 
 ## 🔬 Outputs de ejemplo · Qué devuelve cada motor
 
-> Respuestas reales del sistema sobre **BTC**. Radar capturado el **2026-09-03** con la demo key pública; Quant Plus, el **2026-09-01**; Quant PRO, el **2026-10-03**, salida del motor `v1.2.0-quant` sobre Binance en vivo con el envoltorio del API. Radar y Quant Plus son anteriores a `v2.3.0` (2026-10-01): cada sello dice su `engine_version`, y [SEAL.md](docs/SEAL.md) explica qué regla aplica a cada versión.
+> Respuestas reales del sistema sobre **BTC**. Radar capturado el **2026-09-03** con la demo key pública; Quant Plus, el **2026-09-01**; Quant PRO, el **2026-10-03**, desde producción, con el motor `v1.2.0-quant`. Radar y Quant Plus son anteriores a `v2.3.0` (2026-10-01): cada sello dice su `engine_version`, y [SEAL.md](docs/SEAL.md) explica qué regla aplica a cada versión.
 
 <details>
 <summary>📡 Motor Radar · Sentimiento sobre fuentes verificadas · sello audit_trail</summary>
@@ -305,7 +305,7 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
 {
   "status": "success",
   "version": "1.0.0",
-  "timestamp": "2026-10-03T14:51:37.356Z",
+  "timestamp": "2026-10-03T16:55:01.283Z",
   "data": {
     "asset": {
       "id": "btc",
@@ -332,7 +332,7 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
         "kalman_score": 15
       },
       "candle_count": 500,
-      "timestamp": "2026-10-03T14:51:36.832706Z"
+      "timestamp": "2026-10-03T16:55:00.630512Z"
     },
     "micro_4h": {
       "timeframe": "4h",
@@ -346,15 +346,15 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
         "kalman_score": 15
       },
       "candle_count": 1000,
-      "timestamp": "2026-10-03T14:51:37.356404Z"
+      "timestamp": "2026-10-03T16:55:01.211530Z"
     },
     "version": "v1.2.0-quant",
     "audit_trail": {
       "protocol_hash": "0xbffe1e8746bffdfba216cbff2490d5d077754a2827edddb99656abb90d9e3ab6",
-      "calculated_at": "2026-10-03T14:51:37.356754Z",
+      "calculated_at": "2026-10-03T16:55:01.212238Z",
+      "seal_type": "output_seal",
       "algorithm_id": "Kalman-Adaptive + Confluence (Dual-Timeframe MIR)",
-      "engine_version": "v1.2.0-quant",
-      "seal_type": "output_seal"
+      "engine_version": "v1.2.0-quant"
     }
   }
 }
