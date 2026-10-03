@@ -9,7 +9,7 @@
 
 
 
-Plataforma de análisis de criptomonedas con cuatro motores especializados: tres puramente matemáticos y uno con IA auditada por Python, para que los números nunca mientan.
+Plataforma de análisis de criptomonedas con tres motores especializados, dos puramente matemáticos y uno con IA auditada por Python, para que los números nunca mientan. Sobre ellos, Market Scan rankea el universo con las señales de Quant Plus.
 
 <br/>
 
@@ -34,7 +34,7 @@ Plataforma de análisis de criptomonedas con cuatro motores especializados: tres
 ## 📋 Tabla de Contenidos
 
 - [El problema que resolvemos](#-el-problema-que-resolvemos)
-- [Arquitectura · Cuatro Motores Especializados](#-arquitectura--cuatro-motores-especializados)
+- [Arquitectura · Tres Motores y Market Scan](#-arquitectura--tres-motores-y-market-scan)
 - [Pipeline Anti-Alucinación · Defensa en 4 Capas](#️-pipeline-anti-alucinación--defensa-en-4-capas)
 - [Probalo ahora](#-probalo-ahora)
 - [Stack Tecnológico Completo](#️-stack-tecnológico-completo)
@@ -63,14 +63,14 @@ de indicadores técnicos y datos on-chain leídos directamente de la blockchain.
 
 ---
 
-## 🧠 Arquitectura · Cuatro Motores Especializados
+## 🧠 Arquitectura · Tres Motores y Market Scan
 
 | Motor | Rol | Tecnología clave |
 |:---|:---|:---|
 | 📡 **Motor Radar** | Ingesta seis fuentes RSS verificadas (Cointelegraph, CoinDesk, Decrypt, The Block, Bitcoin Magazine, CryptoSlate) y genera sentimiento + resúmenes ejecutivos sin sensacionalismo. Cada fuente entra con su tier de credibilidad, y la matemática determinista valida o invalida la narrativa antes de publicarla. | `Python` · `LLM engine (multi-model)` · `feedparser` · `BeautifulSoup` |
 | 📊 **Motor Quant PRO** | Señal cuantitativa on-demand sobre cualquier par de Binance: filtro de Kalman adaptativo para reducir ruido, cinco indicadores técnicos y Matriz de Intercepción de Régimen (MIR) dual-timeframe 1D/4H. | `NumPy` · `SciPy` · `Pandas` · `TA-Lib` · `Binance REST` |
 | 📈 **Motor Quant Plus** | Señales estadísticas pre-computadas sobre 50 períodos: Z-Score logarítmico con umbral t-Student (α=0.001 del modelo; con precios reales de cripto se cruza cerca de 1 de cada 75 días por moneda), enriquecimiento on-chain vía RPC (congestión de red, actividad de ballenas) e insight accionable con sello SHA-256 reproducible. | `NumPy` · `SciPy` · `Pydantic` · `Mempool RPC` |
-| 🧭 **Motor Market Scan** | Ranking del universo curado por fuerza de señal, armado sobre las señales de Quant Plus. Deja fuera a las stablecoins mientras aguantan la paridad: si una se despega, vuelve al ranking, porque un *depeg* es una señal. | `TypeScript` · `PostgreSQL` |
+| 🧭 **Market Scan** (capa, no motor) | Ranking del universo curado por fuerza de señal, armado sobre las señales de Quant Plus: no corre modelo propio, y se vende aparte, con su propio pase. Deja fuera a las stablecoins mientras aguantan la paridad: si una se despega, vuelve al ranking, porque un *depeg* es una señal. | `TypeScript` · `PostgreSQL` |
 
 ### Cobertura por motor
 
@@ -470,7 +470,7 @@ Eso es todo. Sin key, el paquete cae en la key pública de demostración y `get_
 | `batch_signals` | Quant Plus | Señales de varios activos en una llamada |
 | `scan_market` | Market Scan | Ranking del universo curado por fuerza de señal |
 
-Cuatro herramientas, y **las cuatro son motores propios**. El dato de terceros (precios, macro) se retiró de esta superficie a propósito: por MCP viaja solo lo que nuestros motores firman.
+Cuatro herramientas, y **las cuatro devuelven inteligencia propia**: los tres motores y el ranking de Market Scan. El dato de terceros (precios, macro) se retiró de esta superficie a propósito: por MCP viaja solo lo que nuestros motores firman.
 
 El paquete es un **cliente delgado, no una segunda implementación**. Consume el mismo API público que cualquier otro consumidor y reenvía las respuestas **verbatim**, así que el `protocol_hash` que llega a tu agente es idéntico byte a byte al que sirvió el API. Se publica desde CI con **procedencia npm (SLSA)**, sin ningún token de larga vida: la única vía de publicar es un tag firmado sobre el repositorio público.
 

@@ -1,6 +1,6 @@
 # 🗺️ CryptoCapi — Estructura del Proyecto
 
-Monorepo de 3 servicios (Backend Node, Collector Python, Frontend Vite) con contratos compartidos. El núcleo del producto son **4 motores**: **Radar** (NLP/IA), **Quant Pro** (matemático/Binance), **Quant Plus** (estadístico + on-chain, 100% determinista) y **Market Scan** (ranking sobre las señales de Quant Plus).
+Monorepo de 3 servicios (Backend Node, Collector Python, Frontend Vite) con contratos compartidos. El núcleo del producto son **3 motores**: **Radar** (NLP/IA), **Quant Pro** (matemático/Binance) y **Quant Plus** (estadístico + on-chain, 100% determinista), más **Market Scan**, una capa de ranking sobre las señales de Quant Plus que se vende aparte.
 
 ```
 cryptocapi-refactor/

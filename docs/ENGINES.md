@@ -1,6 +1,6 @@
 # Engines — CryptoCapi API v1
 
-CryptoCapi exposes four analytical engines. Each targets a different use case and execution model, and each one is sold as its own pass: a key that holds one engine does not open the others (see [Entitlement](AUTHENTICATION.md#entitlement-one-pass-per-engine)). The public demo key opens Radar and Quant Plus for `bitcoin` and `ethereum`, with no signup.
+CryptoCapi exposes three analytical engines and Market Scanner, a ranking layer built on Quant Plus signals that runs no model of its own. Each targets a different use case and execution model, and each one is sold as its own pass: a key that holds one does not open the others (see [Entitlement](AUTHENTICATION.md#entitlement-one-pass-per-engine)). The public demo key opens Radar and Quant Plus for `bitcoin` and `ethereum`, with no signup.
 
 ---
 
@@ -78,7 +78,7 @@ CryptoCapi exposes four analytical engines. Each targets a different use case an
 
 ## Market Scanner
 
-**What it does:** Scans all assets currently scored by Quant Plus and returns a ranked list by signal strength. Useful for discovering which assets in the universe have the strongest directional conviction at a given moment.
+**What it does:** A ranking layer, not an engine: it runs no model of its own. Scans all assets currently scored by Quant Plus and returns a ranked list by signal strength. Useful for discovering which assets in the universe have the strongest directional conviction at a given moment.
 
 **Output includes:**
 - Ranked array of assets with signal, score, and regime
