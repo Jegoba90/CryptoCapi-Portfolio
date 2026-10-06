@@ -50,13 +50,22 @@ The `seal_type` field is always present so consumers know exactly what they are 
 
 The Quant Plus `audit_trail` is self-contained: it carries everything needed to reproduce the result independently. No external data source is required, and you never have to ask us for anything.
 
-**Step 1 — recompute the numbers.** From `input_vector` alone you can reproduce all three:
+**Step 1 — recompute the numbers.** From `input_vector` alone you can reproduce all four:
 
 | Value | How |
 |---|---|
 | `z_score` | Logarithmic returns between consecutive prices (`ln(p[i]/p[i-1]) * 100`); take the latest return and score it against the mean and **sample** standard deviation of the previous 49. Round to 4 decimals. |
 | `bollinger_bandwidth` | SMA over the last 20 prices, bands at ±2 **population** standard deviations at full precision, then `(upper - lower) / sma`. Round to 4 decimals. Seals up to `v2.2.0-math` rounded each band to 2 decimals before the ratio. |
-| `market_regime` | Derived from `z_score`, `daily_change_pct` and the published `regime_thresholds`. |
+| `daily_change_pct` | The change of the last closed day, in percent: `(p[-1] / p[-2] - 1) * 100`, rounded to 6 decimals. From `v2.4.0-math`; earlier seals carried CoinGecko's live 24 h change, which cannot be recomputed. |
+| `market_regime` | From `v2.4.0-math`, with the rule below. |
+
+**How `market_regime` is derived** (`v2.4.0-math` onward):
+
+1. Work with the change of the last closed day as above (`change`, in percent) and the Bollinger bands of the last 20 prices. The bands are *broken* when the last price lies outside them and the bandwidth is above 1.5 %. There is an *alert* when the bands are broken or `|change| >= 5`.
+2. Mind the units: `regime_thresholds` publishes its boundaries as **fractions** (`daily_change_trend_boundary: 0.02` is 2 %, `volatility_hard_limit: 0.05` is 5 %), while `change` is in percent. Multiply the boundaries by 100 before comparing.
+3. Layers, in order: `|z_score| >= z_score_anomaly_boundary` gives `EXTREME_VOLATILITY`; otherwise `|z_score| >= 2` gives `UNUSUAL_VOLATILITY`; otherwise an alert or `|change| > 2` gives `BULLISH_TREND` when `change > 0` and `BEARISH_TREND` when not; otherwise `RANGING_CHOP`.
+4. Noise layer: if `|z_score| <= 0.5` and the result is a trend, it becomes `RANGING_CHOP`.
+5. Assets pegged to the dollar: when `regime_thresholds` carries `peg_deviation_boundary` (0.005), none of the above applies. The regime is `EXTREME_VOLATILITY` if `|p[-1] - 1| >= peg_deviation_boundary` and `RANGING_CHOP` otherwise. Their `z_score` is still published, but it measures noise around the peg and decides nothing.
 
 **Step 2 — build the payload.** Exactly these eight keys, taken from the response as published:
 
@@ -135,6 +144,8 @@ A match confirms the response you are holding carries exactly the inputs and out
 > **Version boundary, stated plainly.** The canonical number form above applies to seals from **`v2.2.0-math`** onward (Radar `v2.2.0-radar`, Quant Pro `v1.1.0-quant`). Earlier seals serialized numbers directly, which meant a price landing on a whole number lost its decimal part in transport and the recomputed hash would not match. `engine_version` travels inside the response precisely so you can tell which rule applies to what you are holding.
 >
 > **Second boundary: `v2.3.0-math`.** The Bollinger bands are no longer rounded before the ratio, and `input_vector` carries the exact values the engine computed with (up to `v2.2.0-math` it was rounded to 4 decimals). With the full-precision vector, exact ties at 6 decimals are common, so the rounding rule of step 3 stops being a detail. The series also holds closed daily candles only: the last date in the vector is the last complete day, never a live price. On Radar, `v2.3.0-radar` lowercases the model's sentiment before sealing it, and when the model gives no valid one, Python sets `neutral` and the trail says so in `sentiment_override`.
+>
+> **Third boundary: `v2.4.0-math`.** Everything that decides the regime now reads the last closed day, so the regime rebuilds from the response alone, with the rule above. Up to `v2.3.0-math` the trend layer used CoinGecko's live 24 h change and the band break used the live price, two inputs that never travelled in the response: on those seals you can check that the hash covers the regime, but not rederive it. Stablecoins are read by their distance to the dollar from `v2.4.0` on. On Radar, `v2.4.0-radar` removes every sentence that mentions volume, in the report and in the summary, and lists `summary` in `fields_overridden` when it had to replace it.
 
 A complete, live response you can run this on is committed at [`api/examples/quant-plus-signal.json`](../api/examples/quant-plus-signal.json). It is a real bitcoin insight sealed with `v2.2.0-math` (so its bands follow the earlier rounding rule), and its vector contains one whole-number price, so verifying it exercises the canonical rule rather than assuming it.
 

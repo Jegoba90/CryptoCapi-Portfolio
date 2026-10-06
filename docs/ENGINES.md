@@ -40,11 +40,11 @@ CryptoCapi exposes three analytical engines and Market Scanner, a ranking layer 
 **What it does:** Produces a fully deterministic quantitative signal for each asset in the scheduled universe. No AI is involved — every output field is computed by Python from historical price data.
 
 **Output includes:**
-- `actionable_insight.signal`: `BUY_WATCH` | `SELL_WATCH` | `ALERT` | `HOLD`, with its `risk_level` (`LOW` | `MEDIUM` | `HIGH`) and the `trigger_condition` that explains it
+- `actionable_insight.signal`: `BUY_WATCH` | `SELL_WATCH` | `ALERT` | `HOLD`, with its `risk_level` (`LOW` | `MEDIUM` | `HIGH`) and the `trigger_condition` that explains it. Stablecoins (USDT, USDC, DAI, FDUSD, USDe) are read by the distance of their last close to the dollar: `HOLD` while it stays under 0.5 %, `ALERT` when it reaches it. They never get `BUY_WATCH` or `SELL_WATCH`
 - `sentiment`: `bullish` | `bearish` | `neutral`
-- `market_regime`: same 5-regime taxonomy as Radar
-- `confidence`: deterministic `score` and `label`, from data coverage and volatility, lowered when the on-chain read is unavailable
-- `onchain_stats`: network congestion, whale activity and how reliable the on-chain read was
+- `market_regime`: same 5-regime taxonomy as Radar, read from the last closed daily candle
+- `confidence`: deterministic `score` and `label`, from data coverage and volatility. It comes from prices only, so it is the same number Radar gives for the same reading
+- `onchain_stats`: network congestion, whale activity and how reliable the on-chain read was. Reported on its own: it does not move the signal or its confidence
 - `math_diagnostics.audit_trail`: `reproducible` SHA-256 hash. It includes the input price vector, so third parties can independently recompute the result and verify it matches (see [SEAL.md](SEAL.md))
 
 **Endpoints:**
