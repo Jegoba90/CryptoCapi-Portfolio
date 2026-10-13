@@ -95,8 +95,6 @@ These endpoints return data to any caller with no key:
 | `GET /market/market-summary` | Global market cap, BTC dominance, Fear & Greed |
 | `GET /market/market-history` | Historical market cap snapshots |
 | `GET /market/assets/:id` | Asset detail (description, ATH/ATL, supply) |
-| `GET /market/macro` | Macro indicators (Fed rate, CPI, DXY, M2) |
-| `GET /market/global-inflation` | CPI by country (World Bank) |
 
 ---
 

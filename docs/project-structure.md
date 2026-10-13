@@ -25,7 +25,7 @@ cryptocapi-refactor/
 │   │   │   ├── access/                 # API keys, plans, B2B auth
 │   │   │   ├── asset/                  # Assets (coins, tokens)
 │   │   │   ├── internal/               # Internal endpoints (collector -> backend)
-│   │   │   ├── market/                 # Market data, insights, ETF, macro
+│   │   │   ├── market/                 # Market data, insights
 │   │   │   ├── payments/               # PayPal / monetization
 │   │   │   ├── proxy/                  # Requests proxy
 │   │   │   └── quant/                  # Quant Pro (on-demand proxy to engine), Quant Plus batch, Market Scan
@@ -49,8 +49,6 @@ cryptocapi-refactor/
 │   │   ├── onchain_manager.py          # On-chain: Alchemy (ETH gas) + Mempool.space (BTC)
 │   │   ├── api_client.py               # CoinGecko API client
 │   │   ├── yfinance_client.py          # Yahoo Finance client (verified ticker, closed daily candles)
-│   │   ├── fred_client.py              # Federal Reserve API client (macro)
-│   │   ├── world_bank_client.py        # World Bank API client (global inflation)
 │   │   └── news_scraper.py             # RSS news feed ingestor
 │   ├── quant/                          # 📊 QUANT PRO — Binance math engine (deterministic)
 │   │   ├── engine.py                   # Dual-timeframe analysis orchestrator (1D/4H)

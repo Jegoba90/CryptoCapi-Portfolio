@@ -500,7 +500,7 @@ curl https://www.cryptocapi.com/docs/agentes.md
 
 > **Ramificá por el `Content-Type`, no por el código de estado.** Una URL `.md` sin espejo devuelve **200 con el cascarón HTML**, así que `text/markdown` es la única señal fiable de que el espejo existe. Es el error más fácil de cometer contra esta superficie, y por eso está escrito acá.
 
-**Las vistas de mercado quedan fuera del espejo a propósito.** Precios, resumen de mercado y macro son dato de terceros que sirve el API; espejarlos como documentos convertiría el sitio en un feed gratis de aquello para lo que están los motores. La ausencia es una decisión, no un hueco.
+**Las vistas de mercado quedan fuera del espejo a propósito.** Precios y resumen de mercado son dato de terceros que sirve el API; espejarlos como documentos convertiría el sitio en un feed gratis de aquello para lo que están los motores. La ausencia es una decisión, no un hueco.
 
 ### Descubrimiento: que no haya que adivinar nada
 
