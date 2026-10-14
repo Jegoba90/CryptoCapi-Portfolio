@@ -86,5 +86,5 @@ The **proof** is an OpenTimestamps file proof over the manifest's bytes. A day t
 ## Things to Know
 
 - **The 2026-09-30 exception.** It is the only day anchored outside v1: its lines are in id order **as text** (`1`, `10`, `100`, …, `99`), because of a bug fixed on 2026-10-13. The anchor is confirmed and cannot be changed. Its proof still holds, because a receipt is looked up by its id. The list says so in the data (`id_order: "text"`), its `max_id` is 99 (the last line) rather than the day's highest id (166), and the verifier accepts that order for that day only.
-- **The proven date is the block's, not the day's.** Days are anchored after 01:00 UTC of the next day. The days up to 2026-10-11 were anchored late, in one batch, when automatic anchoring started on 2026-10-12 (2026-10-05 on 2026-10-13), so their block is later than the day.
+- **The proven date is the block's, not the day's.** Days are anchored after 01:00 UTC of the next day. The days up to 2026-10-11 were anchored late, in one batch, when automatic anchoring started (2026-10-13, 00:04 UTC; 2026-10-05 later that day), so their block is later than the day.
 - **One byte changes everything.** If the manifest goes through anything that converts line endings (LF to CRLF), its digest changes and it no longer verifies. Download it and use it as is.
