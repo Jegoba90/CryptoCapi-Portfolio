@@ -123,13 +123,12 @@ curl -H "x-api-key: demo_btc_eth_public" \
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-DD2C00?style=for-the-badge&logo=firebase&logoColor=white)
 ![Zod](https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)
 
-> `Lightweight Charts` (TradingView) · `Swiper` · `jsVectorMap` · `Prism.js` · `DOMPurify` (sanitización XSS) · `date-fns` · `Temporal API`
+> `Prism.js` · `DOMPurify` (sanitización XSS) · `Temporal API`
 
 ### ⚙️ Backend / API
 ![Node.js](https://img.shields.io/badge/Node.js-5FA04E?style=for-the-badge&logo=nodedotjs&logoColor=white)
@@ -500,7 +499,7 @@ curl https://www.cryptocapi.com/docs/agentes.md
 
 > **Ramificá por el `Content-Type`, no por el código de estado.** Una URL `.md` sin espejo devuelve **200 con el cascarón HTML**, así que `text/markdown` es la única señal fiable de que el espejo existe. Es el error más fácil de cometer contra esta superficie, y por eso está escrito acá.
 
-**Las vistas de mercado quedan fuera del espejo a propósito.** Precios y resumen de mercado son dato de terceros que sirve el API; espejarlos como documentos convertiría el sitio en un feed gratis de aquello para lo que están los motores. La ausencia es una decisión, no un hueco.
+**El dato de mercado no tiene página ni espejo, a propósito.** Precios y resumen de mercado son dato de terceros que sirve el API; publicarlos como páginas convertiría el sitio en un feed gratis de aquello para lo que están los motores. La ausencia es una decisión, no un hueco.
 
 ### Descubrimiento: que no haya que adivinar nada
 

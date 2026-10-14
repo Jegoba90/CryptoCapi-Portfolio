@@ -73,7 +73,7 @@ cryptocapi-refactor/
 │   │   │                               #   agentCatalog (.well-known), sitemapRoutes
 │   │   ├── features/                   # access, api, api-management, auth, docs,
 │   │   │                               #   home, market, methodology, portfolio,
-│   │   │                               #   precios, search, status, shared
+│   │   │                               #   precios, status, shared
 │   │   ├── services/                   # API layer + Firebase (auth, firestore)
 │   │   ├── shared/                     # UI components, utils (formatters, state, EventBus)
 │   │   ├── config/                     # Endpoints, constants
