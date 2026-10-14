@@ -438,6 +438,7 @@ Este es el motor cuyo sello **podés recalcular vos**. El vector de entrada abaj
 | [AUTHENTICATION.md](docs/AUTHENTICATION.md) | API keys, planes, rate limits y payload shaping por tier |
 | [ENGINES.md](docs/ENGINES.md) | Universo de monedas, latencias, endpoints y cuándo usar cada motor |
 | [SEAL.md](docs/SEAL.md) | Qué garantiza el sello Math Override Certified y cómo verificarlo |
+| [SIGNAL_HISTORY.md](docs/SIGNAL_HISTORY.md) | El historial de señales anclado en Bitcoin: los endpoints públicos, sin clave, y cómo verificar un día con [`tools/verificar_recibo.py`](tools/verificar_recibo.py) |
 
 ---
 
