@@ -113,7 +113,7 @@ curl -H "x-api-key: demo_btc_eth_public" \
 
 **En tu terminal.** El agente open source [anti-hallucination-crypto-agent](https://github.com/Jegoba90/anti-hallucination-crypto-agent) consume esta API en vivo, muestra qué eliminó o sobrescribió el pipeline sobre la salida de la IA (`filters_applied`, `fields_overridden`) y te enseña a verificar el `protocol_hash` por tu cuenta. Viene con la demo key precargada: clonar y ejecutar.
 
-**Trial PRO de 14 días, sin tarjeta,** para el resto de monedas y los motores Quant: [cryptocapi.com](https://cryptocapi.com)
+**Trial PRO de 14 días, sin tarjeta,** para el resto de monedas y los motores Quant: [cryptocapi.com](https://www.cryptocapi.com)
 
 ---
 
@@ -521,7 +521,9 @@ Para clientes que no hablan MCP, el archivo [`llms.txt`](https://www.cryptocapi.
 | [`llms.txt` en vivo](https://www.cryptocapi.com/llms.txt) | Índice legible por agentes: motores, autenticación y a dónde ir después |
 | [Contrato OpenAPI descargable](https://api.cryptocapi.com/v1/openapi.json) | El documento en sí, para generar un cliente |
 | [Referencia navegable del API](https://api.cryptocapi.com/v1/docs) | El mismo contrato, para leerlo con ojos humanos |
-| [Guía de IA y agentes](https://cryptocapi.com/docs/agentes) | Cómo integrar el API dentro de un flujo agéntico |
+| [Guía de IA y agentes](https://www.cryptocapi.com/docs/agentes) | Cómo integrar el API dentro de un flujo agéntico |
+| [Bot de trading con Claude](https://www.cryptocapi.com/guias/bot-de-trading-con-claude) | Claude analiza con números sellados por MCP, sin inventarlos |
+| [Señales para tu bot de trading](https://www.cryptocapi.com/guias/bot-de-trading) | La misma idea desde Python: la señal es nuestra, la orden la manda tu exchange |
 
 **Funciona donde construyas:** Claude Code · Cursor · GitHub Copilot · ChatGPT · LangChain · cualquier cliente REST.
 
@@ -554,7 +556,7 @@ Detrás de cada Z-Score hay gente que cree que los números no deberían mentirl
 
 <br/>
 
-<a href="https://cryptocapi.com">
+<a href="https://www.cryptocapi.com">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/logo-white.png">
     <img src="assets/logo-navy.png" alt="CryptoCapi" width="72"/>
