@@ -38,7 +38,6 @@ Plataforma de análisis de criptomonedas con tres motores especializados, dos pu
 - [Pipeline Anti-Alucinación · Defensa en 4 Capas](#️-pipeline-anti-alucinación--defensa-en-4-capas)
 - [Probalo ahora](#-probalo-ahora)
 - [Stack Tecnológico Completo](#️-stack-tecnológico-completo)
-- [Flujo de Datos](#-flujo-de-datos)
 - [Principios de Ingeniería](#️-principios-de-ingeniería)
 - [Outputs de ejemplo · Qué devuelve cada motor](#-outputs-de-ejemplo--qué-devuelve-cada-motor)
 - [Nativo para agentes](#-nativo-para-agentes)
@@ -52,8 +51,8 @@ Plataforma de análisis de criptomonedas con tres motores especializados, dos pu
 > Los modelos de lenguaje **alucinan**. En finanzas, una alucinación cuesta dinero real.
 
 CryptoCapi resuelve esto con una arquitectura donde la **IA solo interpreta narrativa** (noticias, sentimiento)
-y **toda decisión numérica la calcula matemática verificable**: Z-Scores, filtros de Kalman, confluencia
-de indicadores técnicos y datos on-chain leídos directamente de la blockchain.
+y **toda decisión numérica la calcula matemática verificable**: Z-Scores, filtros de Kalman y confluencia
+de indicadores técnicos, sobre cierres diarios de Yahoo Finance y velas de Binance.
 
 <div align="center">
 
@@ -67,9 +66,9 @@ de indicadores técnicos y datos on-chain leídos directamente de la blockchain.
 
 | Motor | Rol | Tecnología clave |
 |:---|:---|:---|
-| 📡 **Motor Radar** | Ingesta seis fuentes RSS verificadas (Cointelegraph, CoinDesk, Decrypt, The Block, Bitcoin Magazine, CryptoSlate) y genera sentimiento + resúmenes ejecutivos sin sensacionalismo. Cada fuente entra con su tier de credibilidad, y la matemática determinista valida o invalida la narrativa antes de publicarla. | `Python` · `LLM engine (multi-model)` · `feedparser` · `BeautifulSoup` |
+| 📡 **Motor Radar** | Ingesta cinco fuentes RSS verificadas (CoinDesk, The Block, Decrypt, CryptoSlate, Bitcoin Magazine) y genera sentimiento + resúmenes ejecutivos sin sensacionalismo. Cada fuente entra con su tier de credibilidad, y la matemática determinista valida o invalida la narrativa antes de publicarla. | `Python` · `LLM engine (multi-model)` · `feedparser` · `BeautifulSoup` |
 | 📊 **Motor Quant PRO** | Señal cuantitativa on-demand sobre cualquier par de Binance: filtro de Kalman adaptativo para reducir ruido, cinco indicadores técnicos y Matriz de Intercepción de Régimen (MIR) dual-timeframe 1D/4H. | `NumPy` · `SciPy` · `Pandas` · `TA-Lib` · `Binance REST` |
-| 📈 **Motor Quant Plus** | Señales estadísticas pre-computadas sobre 50 períodos: Z-Score logarítmico con umbral t-Student (α=0.001 del modelo; con precios reales de cripto se cruza cerca de 1 de cada 75 días por moneda), enriquecimiento on-chain vía RPC (congestión de red, actividad de ballenas) e insight accionable con sello SHA-256 reproducible. | `NumPy` · `SciPy` · `Pydantic` · `Mempool RPC` |
+| 📈 **Motor Quant Plus** | Señales estadísticas pre-computadas sobre 51 cierres diarios: el retorno logarítmico del último día contra los 49 anteriores, con umbral t-Student (α=0.001 del modelo; con precios reales de cripto se cruza cerca de 1 de cada 75 días por moneda), e insight accionable con sello SHA-256 reproducible. En BTC y ETH suma contexto on-chain (congestión de red, actividad de ballenas), que se informa aparte y no mueve la señal. | `NumPy` · `SciPy` · `Pydantic` · `Mempool RPC` |
 | 🧭 **Market Scan** (capa, no motor) | Ranking del universo curado por fuerza de señal, armado sobre las señales de Quant Plus: no corre modelo propio, y se vende aparte, con su propio pase. Deja fuera a las stablecoins mientras aguantan la paridad: si una se despega, vuelve al ranking, porque un *depeg* es una señal. | `TypeScript` · `PostgreSQL` |
 
 ### Cobertura por motor
@@ -103,6 +102,12 @@ La resiliencia de IA se apoya en **cadenas de fallback multi-modelo sobre bucket
 ---
 
 ## 🚀 Probalo ahora
+
+**Sin key.** La vista pulse de Radar es pública, siempre que pases `view=pulse` en la URL (sin el parámetro, la ruta pide key):
+
+```bash
+curl "https://api.cryptocapi.com/v1/market/insights/bitcoin?view=pulse"
+```
 
 **Sin registro.** La demo key pública (limitada a BTC y ETH, 30 req/hora por IP) devuelve el payload Alpha completo, sello `audit_trail` incluido:
 
@@ -172,20 +177,7 @@ curl -H "x-api-key: demo_btc_eth_public" \
 ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?style=for-the-badge&logo=prettier&logoColor=black)
 ![Ruff](https://img.shields.io/badge/Ruff-D7FF64?style=for-the-badge&logo=ruff&logoColor=black)
 
-> Tipado estricto verificado con `Mypy` · `Pyright` · `type-coverage` · análisis de código muerto con `knip`
-
----
-
-## 🔄 Flujo de Datos
-
-<div align="center">
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/data-flow-dark.svg">
-  <img src="assets/data-flow-light.svg" alt="Flujo de datos de CryptoCapi: tres pipelines independientes en Python. Radar consume noticias Tier 1 y precios, y es el único motor que invoca un LLM, con override determinista posterior. Quant PRO consume velas de Binance y Quant Plus lee la blockchain por RPC; ambos son 100% deterministas. Radar y Quant Plus empujan sus resultados a la API Express, mientras que a Quant PRO lo consulta la API on-demand. La API es la única que persiste en PostgreSQL, cachea en Redis y sirve al frontend." width="100%">
-</picture>
-
-</div>
+> Tipado estricto verificado con `Mypy` · `Pyright` · `type-coverage` · análisis de código muerto con `knip` · duplicación y complejidad con `jscpd` y `SonarJS`, que frenan el código nuevo en el CI
 
 ---
 
@@ -222,7 +214,7 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
 
 ## 🔬 Outputs de ejemplo · Qué devuelve cada motor
 
-> Respuestas reales del sistema sobre **BTC**. Radar capturado el **2026-09-03** con la demo key pública; Quant Plus, el **2026-09-01**; Quant PRO, el **2026-10-03**, desde producción, con el motor `v1.2.0-quant`. Radar y Quant Plus son anteriores a `v2.3.0` (2026-10-01): cada sello dice su `engine_version`, y [SEAL.md](docs/SEAL.md) explica qué regla aplica a cada versión.
+> Respuestas reales del sistema sobre **BTC**, desde producción. Radar, capturado el **2026-10-29** con la demo key pública y el motor `v2.4.0-radar`; Quant PRO, el **2026-10-03**, con `v1.2.0-quant`. Quant Plus es del **2026-09-01** y queda con `v2.2.0-math` a propósito: [SEAL.md](docs/SEAL.md) lo usa como caso de verificación, porque su vector trae un precio entero y ejercita la regla canónica de números. Cada sello dice su `engine_version`, y SEAL.md explica qué regla aplica a cada versión.
 
 <details>
 <summary>📡 Motor Radar · Sentimiento sobre fuentes verificadas · sello audit_trail</summary>
@@ -231,23 +223,23 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
 {
   "status": "success",
   "version": "1.0.0",
-  "timestamp": "2026-09-03T23:04:24.278Z",
+  "timestamp": "2026-10-29T12:04:32.178Z",
   "data": {
     "engine_used": "radar",
     "asset": { "id": "bitcoin", "symbol": "BTC" },
-    "generated_at": "2026-09-03T23:04:24.278Z",
-    "summary": "fortaleza estructural",
-    "sentiment": "bullish",
+    "generated_at": "2026-10-29T12:04:32.178Z",
+    "summary": "Lateralización de rango.",
+    "sentiment": "neutral",
     "statistical_anomaly_detected": false,
     "confidence": {
-      "score": 0.95,
-      "label": "HIGH"
+      "score": 0.62,
+      "label": "MEDIUM"
     },
     "math_diagnostics": {
-      "z_score": 2.2794,
+      "z_score": 0.2868,
       "z_score_threshold": 3.5051,
-      "bollinger_bandwidth": 0.3225,
-      "market_regime": "BULLISH_TREND",
+      "bollinger_bandwidth": 0.0525,
+      "market_regime": "RANGING_CHOP",
       "extreme_volatility_detected": false,
       "data_quality": "OPTIMAL",
       "data_quality_reason": [],
@@ -259,13 +251,13 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
         "daily_change_trend_boundary": 0.02
       },
       "audit_trail": {
-        "protocol_hash": "0x4440a68517f2929f7c73a90835b8624f8f9861b6d43dca3c37646d351e4de18c",
-        "calculated_at": "2026-09-03T23:04:24.207146Z",
+        "protocol_hash": "0xa4a30c19a7e547155c2a53bf990012be10a2009fee791855e1970338adb65aac",
+        "calculated_at": "2026-10-29T12:04:32.107500Z",
         "seal_type": "process_seal",
         "algorithm_id": "Radar 4-Layer Anti-Hallucination Pipeline",
-        "engine_version": "v2.2.0-radar",
+        "engine_version": "v2.4.0-radar",
         "filters_applied": [
-          "LEY 7 volume"
+          "magnitude inflation"
         ],
         "fields_overridden": [
           "analysis.anomaly_details",
@@ -279,11 +271,11 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
       }
     },
     "analysis": {
-      "detailed_report": "El estado de las bandas indica COMPRESIÓN activa, sugiriendo acumulación de energía volátil previa a una posible expansión direccional. El Z-Score positivo confirma la fortaleza relativa del precio frente a la media móvil. En el frente macroestructural, se observa un pivote significativo en la industria minera: operadores como Hyperscale están desmantelando infraestructura de Bitcoin para contratos de Inteligencia Artificial de alto valor. Este fenómeno representa una reasignación estructural de capital y energía a largo plazo, aunque el impacto inmediato en la oferta circulante es marginal. La acción del precio actual responde a dinámicas técnicas de ruptura, mientras el fundamento sectorial evoluciona hacia la diversificación energética.",
+      "detailed_report": "Tensión Latente: La reciente divulgación de que una entidad de custodia no puede retirar BTC genera inquietud, pero no constituye un catalizador decisivo. El precio opera en la zona inferior de las Bandas de Bollinger, indicando una posición de rango estable sin señales claras de ruptura. La acción de precio se mantiene dentro de la zona de soporte natural, con poca presión alcista o bajista.",
       "sources_verified": [
         {
-          "title": "Bitcoin Miner Ditches Site for AI Deal That Could Top $1.2 Billion",
-          "url": "https://decrypt.co/377363/bitcoin-mine-ai-deal-1-2-billion",
+          "title": "Bitcoin Treasury Datavault AI Says It Can’t Access Its BTC, Stock Tanks",
+          "url": "https://decrypt.co/382116/bitcoin-treasury-datavault-ai-stock-crashes-cant-access-btc",
           "credibility": "Tier 2"
         }
       ],
@@ -293,7 +285,7 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
 }
 ```
 
-> El `audit_trail` declara qué corrigió Python sobre la salida del LLM: `fields_overridden` lista los campos sobrescritos con valores deterministas y `filters_applied`, los filtros léxicos que se dispararon. En esta captura saltó uno, `LEY 7 volume`, y el pipeline llegó a reescribir el propio `detailed_report`. Cómo verificar el hash: [SEAL.md](docs/SEAL.md). La respuesta va entera, sin recortar, y está commiteada tal cual en [api/examples/radar-alpha.json](api/examples/radar-alpha.json).
+> El `audit_trail` declara qué corrigió Python sobre la salida del LLM: `fields_overridden` lista los campos sobrescritos con valores deterministas y `filters_applied`, los filtros léxicos que se dispararon. En esta captura saltó uno, `magnitude inflation`, y el pipeline llegó a reescribir el propio `detailed_report`. Cómo verificar el hash: [SEAL.md](docs/SEAL.md). La respuesta va entera, sin recortar, y está commiteada tal cual en [api/examples/radar-alpha.json](api/examples/radar-alpha.json).
 
 </details>
 
@@ -364,7 +356,7 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
 </details>
 
 <details>
-<summary>⛓️ Motor Quant Plus · Sello reproducible y datos on-chain</summary>
+<summary>📈 Motor Quant Plus · Sello reproducible</summary>
 
 Este es el motor cuyo sello **podés recalcular vos**. El vector de entrada abajo viene abreviado para que se lea; la respuesta completa, con sus 51 precios y sus 51 marcas de tiempo, está commiteada en [`api/examples/quant-plus-signal.json`](api/examples/quant-plus-signal.json), y **ese archivo verifica**: seguí los pasos de [docs/SEAL.md](docs/SEAL.md) y vas a obtener el mismo hash.
 
@@ -461,7 +453,28 @@ Si tu cliente habla **Model Context Protocol**, no hace falta escribir integraci
 }
 ```
 
-Eso es todo. Sin key, el paquete cae en la key pública de demostración y `get_insight` responde para bitcoin y ethereum, con su sello incluido.
+Ese bloque es el formato de Cursor (`.cursor/mcp.json` en el proyecto, o `~/.cursor/mcp.json` para todos), Windsurf y Claude Desktop. **VS Code (GitHub Copilot) usa otra forma:** el archivo es `.vscode/mcp.json`, la clave es `servers` y no `mcpServers`, y cada servidor lleva `"type": "stdio"`.
+
+```json
+{
+  "servers": {
+    "cryptocapi": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@cryptocapi/mcp"]
+    }
+  }
+}
+```
+
+En **Claude Code** y **Codex** es un solo comando. En Claude Code, sin `--scope user` queda solo en el proyecto donde lo corriste.
+
+```bash
+claude mcp add --transport stdio cryptocapi -- npx -y @cryptocapi/mcp
+codex mcp add cryptocapi -- npx -y @cryptocapi/mcp
+```
+
+Eso es todo. Sin key, el paquete cae en la key pública de demostración y `get_insight` responde para bitcoin y ethereum, con su sello incluido. Para usar la tuya, sumá `CRYPTOCAPI_API_KEY` al `env` del bloque, o `--env CRYPTOCAPI_API_KEY=…` al comando (en Claude Code, antes de `--transport`).
 
 | Herramienta | Motor | Qué devuelve |
 |:---|:---|:---|
@@ -472,7 +485,7 @@ Eso es todo. Sin key, el paquete cae en la key pública de demostración y `get_
 
 Cuatro herramientas, y **las cuatro devuelven inteligencia propia**: los tres motores y el ranking de Market Scan. El dato de terceros (precios, macro) se retiró de esta superficie a propósito: por MCP viaja solo lo que nuestros motores firman.
 
-El paquete es un **cliente delgado, no una segunda implementación**. Consume el mismo API público que cualquier otro consumidor y reenvía las respuestas **verbatim**, así que el `protocol_hash` que llega a tu agente es idéntico byte a byte al que sirvió el API. Se publica desde CI con **procedencia npm (SLSA)**, sin ningún token de larga vida: la única vía de publicar es un tag firmado sobre el repositorio público.
+El paquete es un **cliente delgado, no una segunda implementación**. Consume el mismo API público que cualquier otro consumidor y reenvía las respuestas **verbatim**, así que el `protocol_hash` que llega a tu agente es idéntico byte a byte al que sirvió el API. Se publica desde CI con **procedencia npm (SLSA)**, sin ningún token de larga vida: la única vía de publicar es un tag firmado sobre [el repositorio público](https://github.com/Jegoba90/cryptocapi-mcp).
 
 Y cuando un motor no está incluido en tu pase, el error lo dice con nombre propio y con un código que tu agente puede ramificar, en vez de un 403 pelado que lo deje reintentando en círculos.
 
@@ -518,6 +531,7 @@ Para clientes que no hablan MCP, el archivo [`llms.txt`](https://www.cryptocapi.
 | Recurso | Para qué sirve |
 |:---|:---|
 | [`@cryptocapi/mcp` en npm](https://www.npmjs.com/package/@cryptocapi/mcp) | El servidor MCP nativo, con procedencia verificable |
+| [Código del servidor MCP](https://github.com/Jegoba90/cryptocapi-mcp) | El fuente, sus pruebas manuales y la tabla de cada herramienta |
 | [`llms.txt` en vivo](https://www.cryptocapi.com/llms.txt) | Índice legible por agentes: motores, autenticación y a dónde ir después |
 | [Contrato OpenAPI descargable](https://api.cryptocapi.com/v1/openapi.json) | El documento en sí, para generar un cliente |
 | [Referencia navegable del API](https://api.cryptocapi.com/v1/docs) | El mismo contrato, para leerlo con ojos humanos |
@@ -525,7 +539,7 @@ Para clientes que no hablan MCP, el archivo [`llms.txt`](https://www.cryptocapi.
 | [Bot de trading con Claude](https://www.cryptocapi.com/guias/bot-de-trading-con-claude) | Claude analiza con números sellados por MCP, sin inventarlos |
 | [Señales para tu bot de trading](https://www.cryptocapi.com/guias/bot-de-trading) | La misma idea desde Python: la señal es nuestra, la orden la manda tu exchange |
 
-**Funciona donde construyas:** Claude Code · Cursor · GitHub Copilot · ChatGPT · LangChain · cualquier cliente REST.
+**Funciona donde construyas:** Claude Code · Codex · Cursor · VS Code (GitHub Copilot) · LangChain · cualquier cliente REST. ChatGPT no puede lanzar el servidor MCP, porque sus conectores solo llegan a servidores remotos y este corre local.
 
 ¿Querés verlo funcionando? El agente open source [anti-hallucination-crypto-agent](https://github.com/Jegoba90/anti-hallucination-crypto-agent) consume este API en vivo y verifica el sello por su cuenta. Es el ejemplo ejecutable de todo lo anterior.
 

@@ -1,23 +1,23 @@
 {
   "status": "success",
   "version": "1.0.0",
-  "timestamp": "2026-09-03T23:04:24.278Z",
+  "timestamp": "2026-10-29T12:04:32.178Z",
   "data": {
     "engine_used": "radar",
     "asset": { "id": "bitcoin", "symbol": "BTC" },
-    "generated_at": "2026-09-03T23:04:24.278Z",
-    "summary": "fortaleza estructural",
-    "sentiment": "bullish",
+    "generated_at": "2026-10-29T12:04:32.178Z",
+    "summary": "Lateralización de rango.",
+    "sentiment": "neutral",
     "statistical_anomaly_detected": false,
     "confidence": {
-      "score": 0.95,
-      "label": "HIGH"
+      "score": 0.62,
+      "label": "MEDIUM"
     },
     "math_diagnostics": {
-      "z_score": 2.2794,
+      "z_score": 0.2868,
       "z_score_threshold": 3.5051,
-      "bollinger_bandwidth": 0.3225,
-      "market_regime": "BULLISH_TREND",
+      "bollinger_bandwidth": 0.0525,
+      "market_regime": "RANGING_CHOP",
       "extreme_volatility_detected": false,
       "data_quality": "OPTIMAL",
       "data_quality_reason": [],
@@ -29,13 +29,13 @@
         "daily_change_trend_boundary": 0.02
       },
       "audit_trail": {
-        "protocol_hash": "0x4440a68517f2929f7c73a90835b8624f8f9861b6d43dca3c37646d351e4de18c",
-        "calculated_at": "2026-09-03T23:04:24.207146Z",
+        "protocol_hash": "0xa4a30c19a7e547155c2a53bf990012be10a2009fee791855e1970338adb65aac",
+        "calculated_at": "2026-10-29T12:04:32.107500Z",
         "seal_type": "process_seal",
         "algorithm_id": "Radar 4-Layer Anti-Hallucination Pipeline",
-        "engine_version": "v2.2.0-radar",
+        "engine_version": "v2.4.0-radar",
         "filters_applied": [
-          "LEY 7 volume"
+          "magnitude inflation"
         ],
         "fields_overridden": [
           "analysis.anomaly_details",
@@ -49,11 +49,11 @@
       }
     },
     "analysis": {
-      "detailed_report": "El estado de las bandas indica COMPRESIÓN activa, sugiriendo acumulación de energía volátil previa a una posible expansión direccional. El Z-Score positivo confirma la fortaleza relativa del precio frente a la media móvil. En el frente macroestructural, se observa un pivote significativo en la industria minera: operadores como Hyperscale están desmantelando infraestructura de Bitcoin para contratos de Inteligencia Artificial de alto valor. Este fenómeno representa una reasignación estructural de capital y energía a largo plazo, aunque el impacto inmediato en la oferta circulante es marginal. La acción del precio actual responde a dinámicas técnicas de ruptura, mientras el fundamento sectorial evoluciona hacia la diversificación energética.",
+      "detailed_report": "Tensión Latente: La reciente divulgación de que una entidad de custodia no puede retirar BTC genera inquietud, pero no constituye un catalizador decisivo. El precio opera en la zona inferior de las Bandas de Bollinger, indicando una posición de rango estable sin señales claras de ruptura. La acción de precio se mantiene dentro de la zona de soporte natural, con poca presión alcista o bajista.",
       "sources_verified": [
         {
-          "title": "Bitcoin Miner Ditches Site for AI Deal That Could Top $1.2 Billion",
-          "url": "https://decrypt.co/377363/bitcoin-mine-ai-deal-1-2-billion",
+          "title": "Bitcoin Treasury Datavault AI Says It Can’t Access Its BTC, Stock Tanks",
+          "url": "https://decrypt.co/382116/bitcoin-treasury-datavault-ai-stock-crashes-cant-access-btc",
           "credibility": "Tier 2"
         }
       ],

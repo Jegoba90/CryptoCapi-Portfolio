@@ -43,10 +43,10 @@ cryptocapi-refactor/
 ├── 📂 collector/                       # Python 3.12 — Radar + Quant Plus (Cloud Run Job)
 │   ├── services/
 │   │   ├── insight_service.py          # 📡 RADAR — NLP/LLM narrative (LLM engine multi-model)
-│   │   ├── quant_service.py            # ⛓️ QUANT PLUS — on-chain, 100% deterministic (no AI)
+│   │   ├── quant_service.py            # 📈 QUANT PLUS — z-score over 51 Yahoo daily closes, 100% deterministic (no AI)
 │   │   ├── insights_common.py          # Shared Radar/Quant Plus code + post-LLM filters
 │   │   ├── math_engine.py              # MathContext: Z-Score (t-Student), Bollinger, regime
-│   │   ├── onchain_manager.py          # On-chain: Alchemy (ETH gas) + Mempool.space (BTC)
+│   │   ├── onchain_manager.py          # On-chain context, not part of the signal: Mempool.space (BTC) + Alchemy (ETH gas)
 │   │   ├── api_client.py               # CoinGecko API client
 │   │   ├── yfinance_client.py          # Yahoo Finance client (verified ticker, closed daily candles)
 │   │   └── news_scraper.py             # RSS news feed ingestor

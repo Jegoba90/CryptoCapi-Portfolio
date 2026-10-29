@@ -26,6 +26,7 @@ Every account key looks like `sk_live_<id>.<secret>`, whatever its plan. **The p
 | `sk_live_…` with an active pass | **PRO** | Deep analysis and `audit_trail` for **the engine that pass covers** |
 | `sk_live_…` without one | **Free / Pulse** | Public data + Pulse View (summaries only, numeric fields stripped) |
 | `demo_btc_eth_public` | **Demo** | Shared public key. Radar and Quant Plus for `bitcoin`/`ethereum` only, full Alpha payload |
+| no key | **Public** | Only Radar's Pulse view, and only when `view=pulse` is in the URL. Everything else returns 401 |
 
 Keys are obtained via `GET /payments/me` after authenticating with Firebase. The demo key requires no account at all: it is published as-is.
 
@@ -218,7 +219,7 @@ Every error body has `status: "error"` and a `message`. Some also carry a `code`
 
 | HTTP Code | `code` | Meaning |
 |---|---|---|
-| `401` | none | Missing or invalid API key / Firebase token |
+| `401` | none | Missing or invalid API key / Firebase token (except Radar's Pulse view with `view=pulse` in the URL, which needs none) |
 | `403` | `PRODUCT_NOT_INCLUDED` | This key never included that engine (see Entitlement) |
 | `403` | `PRODUCT_NOT_ACTIVE` | This key holds that engine, but the pass lapsed |
 | `403` | `DEMO_COIN_RESTRICTED` | Demo key used on a coin other than `bitcoin`/`ethereum` |

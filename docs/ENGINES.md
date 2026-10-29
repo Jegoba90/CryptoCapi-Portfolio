@@ -29,7 +29,7 @@ CryptoCapi exposes three analytical engines and Market Scanner, a ranking layer 
 - `math_diagnostics.audit_trail`: `process_seal` SHA-256 hash certifying which mathematical corrections were applied
 
 **Endpoint:** `GET /market/insights/:id?view=alpha`
-(`id` = CoinGecko slug, e.g. `bitcoin`, `ethereum`). Without `view=alpha` the route answers the free Pulse view, with no diagnostics and no seal.
+(`id` = CoinGecko slug, e.g. `bitcoin`, `ethereum`). Without `view=alpha` the route answers the free Pulse view, with no diagnostics and no seal. With no key at all it answers only when `view=pulse` is in the URL: leaving `view` out returns 401, even though Pulse is the default.
 
 > **Note on `sources_verified: []`:** An empty sources array is a deliberate signal, not missing data. It means no news from the last window influenced the asset — the analysis is based purely on price action.
 
@@ -48,7 +48,7 @@ CryptoCapi exposes three analytical engines and Market Scanner, a ranking layer 
 - `math_diagnostics.audit_trail`: `reproducible` SHA-256 hash. It includes the input price vector, so third parties can independently recompute the result and verify it matches (see [SEAL.md](SEAL.md))
 
 **Endpoints:**
-- `GET /quant-plus/:id/signal?view=alpha`: single asset signal (`id` = CoinGecko slug, e.g. `bitcoin`). Same payload as `GET /market/insights/:id?engine=quant_plus&view=alpha`. Without `view=alpha`, both answer the free Pulse view.
+- `GET /quant-plus/:id/signal?view=alpha`: single asset signal (`id` = CoinGecko slug, e.g. `bitcoin`). Same payload as `GET /market/insights/:id?engine=quant_plus&view=alpha`. Quant Plus has no Pulse view: both routes always answer the alpha view, whatever `view` asks for, so a key without the Quant Plus pass gets 403.
 - `POST /quant/batch`: signals for up to 50 assets in one request
 
 ```json
