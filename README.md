@@ -214,7 +214,7 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
 
 ## 🔬 Outputs de ejemplo · Qué devuelve cada motor
 
-> Respuestas reales del sistema sobre **BTC**, desde producción. Radar, capturado el **2026-10-29** con la demo key pública y el motor `v2.4.0-radar`; Quant PRO, el **2026-10-03**, con `v1.2.0-quant`. Quant Plus es del **2026-09-01** y queda con `v2.2.0-math` a propósito: [SEAL.md](docs/SEAL.md) lo usa como caso de verificación, porque su vector trae un precio entero y ejercita la regla canónica de números. Cada sello dice su `engine_version`, y SEAL.md explica qué regla aplica a cada versión.
+> Respuestas reales del sistema sobre **BTC**, desde producción. Radar, capturado el **2026-10-29** con la demo key pública y el motor `v2.4.0-radar`; Quant Plus, el **2026-10-30**, con `v2.5.0-math`; Quant PRO, el **2026-10-03**, con `v1.2.0-quant`. Quant Plus es además el caso de verificación de [SEAL.md](docs/SEAL.md): su vector trae un precio entero y una docena de empates exactos, así que ejercita la regla canónica de números en vez de suponerla. Cada sello dice su `engine_version`, y SEAL.md explica qué regla aplica a cada versión.
 
 <details>
 <summary>📡 Motor Radar · Sentimiento sobre fuentes verificadas · sello audit_trail</summary>
@@ -364,56 +364,55 @@ Este es el motor cuyo sello **podés recalcular vos**. El vector de entrada abaj
 {
   "status": "success",
   "version": "1.0.0",
-  "timestamp": "2026-09-01T15:03:57.044Z",
+  "timestamp": "2026-10-30T12:03:11.627Z",
   "data": {
     "engine_used": "quant_plus",
     "asset": { "id": "bitcoin", "symbol": "BTC" },
-    "generated_at": "2026-09-01T15:03:57.044Z",
-    "summary": "Lateralización en bandas normales, con leve presión bajista. Z-Score -0.67, al 19% de su umbral de anomalía (3.51).",
+    "generated_at": "2026-10-30T12:03:11.627Z",
+    "summary": "Volatilidad inusual con sesgo bajista. Z-Score -2.51, al 72% de su umbral de anomalía (3.51).",
     "sentiment": "bearish",
     "statistical_anomaly_detected": false,
     "confidence": {
-      "score": 0.64,
-      "label": "MEDIUM"
+      "score": 0.97,
+      "label": "HIGH"
     },
     "onchain_stats": {
       "network": "bitcoin-mainnet",
       "network_congestion": "LOW",
-      "whale_activity_alert": true,
       "onchain_confidence_score": 0.9
     },
     "actionable_insight": {
       "signal": "HOLD",
-      "risk_level": "LOW"
+      "risk_level": "MEDIUM"
     },
     "math_diagnostics": {
-      "z_score": -0.6651,
+      "z_score": -2.5118,
       "z_score_threshold": 3.5051,
-      "bollinger_bandwidth": 0.3667,
-      "market_regime": "RANGING_CHOP",
+      "bollinger_bandwidth": 0.0675,
+      "market_regime": "UNUSUAL_VOLATILITY",
       "extreme_volatility_detected": false,
       "data_quality": "OPTIMAL",
       "sentiment_override": false,
       "anomaly_details": null,
       "audit_trail": {
-        "protocol_hash": "0x821ba8b9ed9ecc1cca1b16c1d6feb902a7614cb027f2132a1b46d74e3fe3540a",
-        "calculated_at": "2026-09-01T15:03:56.979793Z",
+        "protocol_hash": "0x333c8f30a7ee653d4ede8b823641a342b51e8bc0b87eaf3739cbc673b7633d98",
+        "calculated_at": "2026-10-30T12:03:11.570655Z",
         "seal_type": "reproducible",
         "algorithm_id": "SMA-20 / 2σ / 50-period Z-Score (Returns)",
-        "engine_version": "v2.2.0-math",
+        "engine_version": "v2.5.0-math",
         "data_source": {
           "vendor": "Yahoo Finance (51 daily closes)",
-          "symbol": "BTCUSDT",
+          "symbol": "BTC-USD",
           "timeframe": "1d (50-period log_returns Z-Score)"
         },
-        "input_timestamps": ["2026-07-13T00:00:00Z", "…", "2026-09-01T00:00:00Z"],
-        "input_vector": [62239.1211, "…", 77860.8281],
+        "input_timestamps": ["2026-09-09T00:00:00Z", "…", "2026-10-29T00:00:00Z"],
+        "input_vector": [78259.5234375, "…", 77775.109375],
         "zscore_window_size": 49,
-        "daily_change_pct": -0.5919
+        "daily_change_pct": -4.297503
       }
     },
     "analysis": {
-      "detailed_report": "Régimen de mercado: lateralización. Precio opera en el tercio inferior de las bandas de Bollinger. Z-Score (0.17) en zona neutral — sin anomalías estadísticas."
+      "detailed_report": "Régimen de mercado: volatilidad inusual. Precio opera por debajo de la banda inferior de Bollinger. Z-Score (-2.51) señala desviación bajista significativa. Ancho de banda en expansión — volatilidad creciente."
     }
   }
 }

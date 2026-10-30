@@ -146,8 +146,10 @@ A match confirms the response you are holding carries exactly the inputs and out
 > **Second boundary: `v2.3.0-math`.** The Bollinger bands are no longer rounded before the ratio, and `input_vector` carries the exact values the engine computed with (up to `v2.2.0-math` it was rounded to 4 decimals). With the full-precision vector, exact ties at 6 decimals are common, so the rounding rule of step 3 stops being a detail. The series also holds closed daily candles only: the last date in the vector is the last complete day, never a live price. On Radar, `v2.3.0-radar` lowercases the model's sentiment before sealing it, and when the model gives no valid one, Python sets `neutral` and the trail says so in `sentiment_override`.
 >
 > **Third boundary: `v2.4.0-math`.** Everything that decides the regime now reads the last closed day, so the regime rebuilds from the response alone, with the rule above. Up to `v2.3.0-math` the trend layer used CoinGecko's live 24 h change and the band break used the live price, two inputs that never travelled in the response: on those seals you can check that the hash covers the regime, but not rederive it. Stablecoins are read by their distance to the dollar from `v2.4.0` on. On Radar, `v2.4.0-radar` removes every sentence that mentions volume, in the report and in the summary, and lists `summary` in `fields_overridden` when it had to replace it.
+>
+> **Fourth boundary: `v2.5.0-math`.** The math and the regime rule do not change: a `v2.5.0-math` seal rebuilds exactly like a `v2.4.0-math` one. What changes is the on-chain context next to it, which the seal never covered: `whale_activity_alert` is gone, because it measured the size of the mempool or the gas, not whales, and ethereum carries no on-chain block when there is no gas reading. On Radar, `v2.5.0-radar` publishes nothing for a coin without a verified daily series: it used to read that coin's default z-score of 0 as a calm market.
 
-A complete, live response you can run this on is committed at [`api/examples/quant-plus-signal.json`](../api/examples/quant-plus-signal.json). It is a real bitcoin insight sealed with `v2.2.0-math` (so its bands follow the earlier rounding rule), and its vector contains one whole-number price, so verifying it exercises the canonical rule rather than assuming it.
+A complete, live response you can run this on is committed at [`api/examples/quant-plus-signal.json`](../api/examples/quant-plus-signal.json). It is a real bitcoin insight sealed with `v2.5.0-math` on 2026-10-30, the day after a 4.3 % drop, so everything rebuilds from the vector: the z-score, the bandwidth, the day's change and the regime (`UNUSUAL_VOLATILITY`), and then the hash. Its vector contains one whole-number price, which exercises the canonical rule rather than assuming it, and a dozen exact ties, where `toFixed(6)` gives a different string than the rule above.
 
 ---
 
@@ -157,8 +159,8 @@ The seal never inflates confidence. When data quality is limited, the response s
 
 | Situation | What the API reports |
 |---|---|
-| Insufficient historical data | `data_quality: "INSUFFICIENT"`, `confidence.label: "LOW"` (capped) |
-| Partial data (contingency source) | `data_quality: "PARTIAL"`, `confidence.label` capped at `"MEDIUM"` |
+| No verified daily series | No signal. Neither engine publishes one: Quant Plus since `v2.3.0-math`, Radar since `v2.5.0-radar` |
+| Fewer than 50 daily returns | `data_quality: "PARTIAL"`, `confidence.label` capped at `"MEDIUM"` |
 | Full AI chain exhausted | Insight discarded — not sent. No fabricated analysis. |
 
 `confidence.label` is always derived from the actual data quality — never from the AI's self-assessed confidence.

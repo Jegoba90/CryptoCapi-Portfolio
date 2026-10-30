@@ -44,7 +44,7 @@ CryptoCapi exposes three analytical engines and Market Scanner, a ranking layer 
 - `sentiment`: `bullish` | `bearish` | `neutral`
 - `market_regime`: same 5-regime taxonomy as Radar, read from the last closed daily candle
 - `confidence`: deterministic `score` and `label`, from data coverage and volatility. It comes from prices only, so it is the same number Radar gives for the same reading
-- `onchain_stats`: network congestion, whale activity and how reliable the on-chain read was. Reported on its own: it does not move the signal or its confidence
+- `onchain_stats`: network congestion (on ethereum, also the gas price) and how reliable the on-chain read was. Bitcoin and ethereum only, and ethereum carries no block when there is no gas reading. Reported on its own: it does not move the signal or its confidence
 - `math_diagnostics.audit_trail`: `reproducible` SHA-256 hash. It includes the input price vector, so third parties can independently recompute the result and verify it matches (see [SEAL.md](SEAL.md))
 
 **Endpoints:**

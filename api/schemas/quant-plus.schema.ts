@@ -14,7 +14,6 @@ export const OnchainStatsSchema = z.object({
   mvrv_ratio: z.number().nullable().optional(),
   exchange_netflow_usd: z.number().nullable().optional(),
   active_addresses_24h: z.number().nullable().optional(),
-  whale_activity_alert: z.boolean().nullable().optional(),
   gas_price_gwei: z.number().nullable().optional(),
   network_congestion: z.enum(['LOW', 'MEDIUM', 'HIGH', 'UNKNOWN']).nullable().optional(),
   onchain_confidence_score: z.number().nullable().optional(),
