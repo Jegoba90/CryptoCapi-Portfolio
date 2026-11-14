@@ -10,7 +10,7 @@ The seal certifies the **verification process**, not a perfect result.
 
 **It DOES certify that:**
 - All numeric fields in the response were computed by a deterministic Python engine — not generated or modified by AI
-- Where AI is involved (Radar), mathematical corrections were applied before delivery
+- Where AI is involved (Radar), it only summarizes each news note in one line, and each line was checked against its note before delivery; Python wrote everything else
 - The process is auditable and, for deterministic engines, independently reproducible
 
 **It does NOT certify that:**
@@ -30,7 +30,7 @@ Each engine declares its `seal_type` in the `audit_trail`. The type tells you ex
 |---|---|---|---|
 | **Quant Plus** | `reproducible` | Input price vector + computed outputs | **Yes** — the `audit_trail` is self-contained: recompute from the embedded inputs and compare |
 | **Quant Pro** | `output_seal` | All deterministic output values | **Yes** — re-fetch the same candles from Binance and re-run; any output alteration breaks the hash |
-| **Radar** | `process_seal` | Mathematical corrections applied (overrides + filters triggered) | **No** — AI-generated text is non-deterministic by nature; the hash certifies which corrections Python applied, not the prose itself |
+| **Radar** | `process_seal` | The process: which checks discarded a line of the model (`filters_applied`) and which fields Python set (`fields_overridden`) | **No** — the model's lines are non-deterministic by nature; the hash certifies the checks Python applied, not the lines themselves. Since `v3.0.0-radar` the payload has the same keys, so it rebuilds the same way |
 
 The `seal_type` field is always present so consumers know exactly what they are verifying.
 
@@ -148,8 +148,12 @@ A match confirms the response you are holding carries exactly the inputs and out
 > **Third boundary: `v2.4.0-math`.** Everything that decides the regime now reads the last closed day, so the regime rebuilds from the response alone, with the rule above. Up to `v2.3.0-math` the trend layer used CoinGecko's live 24 h change and the band break used the live price, two inputs that never travelled in the response: on those seals you can check that the hash covers the regime, but not rederive it. Stablecoins are read by their distance to the dollar from `v2.4.0` on. On Radar, `v2.4.0-radar` removes every sentence that mentions volume, in the report and in the summary, and lists `summary` in `fields_overridden` when it had to replace it.
 >
 > **Fourth boundary: `v2.5.0-math`.** The math and the regime rule do not change: a `v2.5.0-math` seal rebuilds exactly like a `v2.4.0-math` one. What changes is the on-chain context next to it, which the seal never covered: `whale_activity_alert` is gone, because it measured the size of the mempool or the gas, not whales, and ethereum carries no on-chain block when there is no gas reading. On Radar, `v2.5.0-radar` publishes nothing for a coin without a verified daily series: it used to read that coin's default z-score of 0 as a calm market.
+>
+> **Fifth boundary: `v2.6.0-math`.** The math, the regime rule and the sealed fields do not change: a `v2.6.0-math` seal rebuilds exactly like a `v2.5.0-math` one. What changes is the text next to it. `BULLISH_TREND` and `BEARISH_TREND` read one day (it moved past 2 % or closed outside its bands, with 0.5 < |z| < 2), and the summary used to call that «Continuidad de tendencia alcista.» or «Debilidad persistente.». It now says «Alza marcada en el último día cerrado, sin llegar a ser inusual.», and the report «Régimen: día alcista.». On Radar, `v3.1.0-radar` carries the same text, and quotes each headline as its medium wrote it: until then every hyphen of every note was dropped before the model read it.
+>
+> **Sixth boundary: `v2.7.0-math`.** The math, the regime rule and the sealed fields do not change: a `v2.7.0-math` seal rebuilds exactly like a `v2.6.0-math` one. What changes is the name of the signal, which the seal never covered. `BUY_WATCH`, `SELL_WATCH`, `ALERT` and `HOLD` become `ANOMALY_UP`, `ANOMALY_DOWN`, `PEG_BROKEN` and `NO_ANOMALY`, with the same rule. The old names read as trades, and over five years and 17 coins the median move three days after a `BUY_WATCH` was −1.64 %. `trigger_condition` now gives the z-score and the threshold with four decimals, and no longer offers an `ALERT` that only a stablecoin could reach.
 
-A complete, live response you can run this on is committed at [`api/examples/quant-plus-signal.json`](../api/examples/quant-plus-signal.json). It is a real bitcoin insight sealed with `v2.5.0-math` on 2026-10-30, the day after a 4.3 % drop, so everything rebuilds from the vector: the z-score, the bandwidth, the day's change and the regime (`UNUSUAL_VOLATILITY`), and then the hash. Its vector contains one whole-number price, which exercises the canonical rule rather than assuming it, and a dozen exact ties, where `toFixed(6)` gives a different string than the rule above.
+A complete, live response you can run this on is committed at [`api/examples/quant-plus-signal.json`](../api/examples/quant-plus-signal.json). It is a real bitcoin insight sealed with `v2.5.0-math` on 2026-10-30 (its signal is still called `HOLD`; since `v2.7.0-math` it is `NO_ANOMALY`), the day after a 4.3 % drop, so everything rebuilds from the vector: the z-score, the bandwidth, the day's change and the regime (`UNUSUAL_VOLATILITY`), and then the hash. Its vector contains one whole-number price, which exercises the canonical rule rather than assuming it, and a dozen exact ties, where `toFixed(6)` gives a different string than the rule above.
 
 ---
 

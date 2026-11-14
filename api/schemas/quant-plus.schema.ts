@@ -22,8 +22,9 @@ export const OnchainStatsSchema = z.object({
 // ── Actionable insight ───────────────────────────────────────────────────────
 
 export const ActionableInsightSchema = z.object({
-  // 'BUY_WATCH' | 'SELL_WATCH' | 'ALERT' | 'HOLD'. Typed as a string, like the
-  // server's own contract, so a new value does not break your client.
+  // 'ANOMALY_UP' | 'ANOMALY_DOWN' | 'NO_ANOMALY' | 'PEG_BROKEN' since v2.7.0-math
+  // ('BUY_WATCH' | 'SELL_WATCH' | 'HOLD' | 'ALERT' before). Typed as a string, like
+  // the server's own contract, so a new value does not break your client.
   signal: z.string(),
   // 'LOW' | 'MEDIUM' | 'HIGH'
   risk_level: z.string(),

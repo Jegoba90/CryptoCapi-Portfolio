@@ -17,16 +17,17 @@ CryptoCapi exposes three analytical engines and Market Scanner, a ranking layer 
 
 ## Radar
 
-**What it does:** Delivers AI-generated market intelligence for each asset in the scheduled universe. For every coin, Radar produces a natural-language analysis, a sentiment label, and a confidence score — with all numeric claims mathematically verified before delivery (see [SEAL.md](SEAL.md)).
+**What it does:** The math of the last closed day plus what the news sources report, for each asset in the scheduled universe. Since `v3.0.0-radar` Python writes the report, the summary, the sentiment and the confidence; a language model only summarizes each news note in one line, and that line is published only if every figure and proper name in it is in the note (see [SEAL.md](SEAL.md)).
 
 **Output includes:**
-- `summary`: concise directional take (1–2 sentences)
-- `detailed_report`: structured narrative (max 150 words)
-- `sentiment`: `bullish` | `bearish` | `neutral`
-- `market_regime`: structural regime: `BULLISH_TREND`, `BEARISH_TREND`, `RANGING_CHOP`, `EXTREME_VOLATILITY`, `UNUSUAL_VOLATILITY`
+- `summary`: the phrase the math dictates for the z-score zone and the regime (the same one Quant Plus publishes)
+- `detailed_report`: written by Python, in Spanish. First the math of the last closed day; then, for each news note of the last 48 h, "<medium> informa que …" (the model's line, checked against the note) or "<medium> titula: «…»" (the line did not pass, so the headline goes out verbatim). With no notes, it says the analyzed sources register none
+- `sentiment`: `bullish` | `bearish` | `neutral`, from the sign of the z-score (`neutral` within |z| ≤ 0.5), never from the model
+- `market_regime`: the regime of the last closed day: `BULLISH_TREND`, `BEARISH_TREND`, `RANGING_CHOP`, `EXTREME_VOLATILITY`, `UNUSUAL_VOLATILITY`. Despite their names, `BULLISH_TREND` and `BEARISH_TREND` describe that day (it moved past 2 % or closed outside its Bollinger bands), not a trend over several days
 - `confidence`: `HIGH` / `MEDIUM` / `LOW` with a numeric score (`0.0–1.0`)
 - `sources_verified`: news sources with credibility tier (`Tier 1`–`3`); empty array means no news met relevance thresholds (not an error)
-- `math_diagnostics.audit_trail`: `process_seal` SHA-256 hash certifying which mathematical corrections were applied
+- `math_diagnostics.band_position`, `volatility_momentum`, `bollinger_bandwidth_delta_pct` and `last_close_date`: what the report may say about the Bollinger bands (where the last close sits, whether the bands open or close) and the UTC day every number reads. Check the report against them. They sit outside the seal, and readings stored before they were published do not carry them
+- `math_diagnostics.audit_trail`: `process_seal` SHA-256 hash certifying the process: which checks discarded a line of the model (`filters_applied`) and which fields Python set (`fields_overridden`)
 
 **Endpoint:** `GET /market/insights/:id?view=alpha`
 (`id` = CoinGecko slug, e.g. `bitcoin`, `ethereum`). Without `view=alpha` the route answers the free Pulse view, with no diagnostics and no seal. With no key at all it answers only when `view=pulse` is in the URL: leaving `view` out returns 401, even though Pulse is the default.
@@ -40,11 +41,12 @@ CryptoCapi exposes three analytical engines and Market Scanner, a ranking layer 
 **What it does:** Produces a fully deterministic quantitative signal for each asset in the scheduled universe. No AI is involved — every output field is computed by Python from historical price data.
 
 **Output includes:**
-- `actionable_insight.signal`: `BUY_WATCH` | `SELL_WATCH` | `ALERT` | `HOLD`, with its `risk_level` (`LOW` | `MEDIUM` | `HIGH`) and the `trigger_condition` that explains it. Stablecoins (USDT, USDC, DAI, FDUSD, USDe) are read by the distance of their last close to the dollar: `HOLD` while it stays under 0.5 %, `ALERT` when it reaches it. They never get `BUY_WATCH` or `SELL_WATCH`
+- `actionable_insight.signal`: what the last closed day measured, not a trade: `ANOMALY_UP` | `ANOMALY_DOWN` when it crossed its anomaly threshold, `NO_ANOMALY` otherwise, with its `risk_level` (`LOW` | `MEDIUM` | `HIGH`) and the `trigger_condition` that explains it. Stablecoins (USDT, USDC, DAI, FDUSD, USDe) are read by the distance of their last close to the dollar: `NO_ANOMALY` while it stays under 0.5 %, `PEG_BROKEN` when it reaches it. Until `v2.6.0-math` the values were `BUY_WATCH`, `SELL_WATCH`, `HOLD` and `ALERT`. Over five years and 17 coins, counting each day once, the median move three days after a `BUY_WATCH` was −1.64 % and after a `SELL_WATCH` +1.43 %: the old names pointed the other way
 - `sentiment`: `bullish` | `bearish` | `neutral`
 - `market_regime`: same 5-regime taxonomy as Radar, read from the last closed daily candle
 - `confidence`: deterministic `score` and `label`, from data coverage and volatility. It comes from prices only, so it is the same number Radar gives for the same reading
 - `onchain_stats`: network congestion (on ethereum, also the gas price) and how reliable the on-chain read was. Bitcoin and ethereum only, and ethereum carries no block when there is no gas reading. Reported on its own: it does not move the signal or its confidence
+- `math_diagnostics.band_position`, `volatility_momentum`, `bollinger_bandwidth_delta_pct` and `last_close_date`: the same four fields as Radar. Outside the seal, but they can be recomputed from the sealed vector and its timestamps
 - `math_diagnostics.audit_trail`: `reproducible` SHA-256 hash. It includes the input price vector, so third parties can independently recompute the result and verify it matches (see [SEAL.md](SEAL.md))
 
 **Endpoints:**
@@ -78,7 +80,7 @@ CryptoCapi exposes three analytical engines and Market Scanner, a ranking layer 
 
 ## Market Scanner
 
-**What it does:** A ranking layer, not an engine: it runs no model of its own. Scans all assets currently scored by Quant Plus and returns a ranked list by signal strength. Useful for discovering which assets in the universe have the strongest directional conviction at a given moment.
+**What it does:** A ranking layer, not an engine: it runs no model of its own. Takes the assets currently scored by Quant Plus and ranks them by `threshold_proximity`: how far each one moved on the last closed day, measured against its own anomaly threshold (1.0 or more = that day was an anomaly). It ranks by size, not direction, and it is not a path toward a signal: the next day's z is measured afresh.
 
 **Output includes:**
 - Ranked array of assets with signal, score, and regime
@@ -88,7 +90,7 @@ CryptoCapi exposes three analytical engines and Market Scanner, a ranking layer 
 **Query parameters:**
 | Param | Values | Default |
 |---|---|---|
-| `strategy` | `balanced` \| `aggressive` \| `conservative` | `balanced` |
+| `strategy` | `balanced` \| `aggressive` \| `conservative` (today all three return the same order: every asset has its full sample) | `balanced` |
 | `limit` | `1`–`50` | `10` |
 
 **Endpoint:** `GET /quant/market-scan`
@@ -118,10 +120,10 @@ The collector runs every hour over a fixed core of **10 coins**, plus up to **5 
 
 | Goal | Engine |
 |---|---|
-| "What's the AI read on Bitcoin right now?" | Radar |
+| "What do the news say about Bitcoin, next to its math?" | Radar |
 | "Give me a pure math signal on Ethereum, reproducible" | Quant Plus |
 | "Analyze PEPEUSDT — not in your universe" | Quant Pro |
-| "Which coins in your universe have the strongest buy signal?" | Market Scanner |
+| "Which coins in your universe moved the most against their own threshold yesterday?" | Market Scanner |
 | "I distrust AI — give me math only" | Quant Plus or Quant Pro |
 
 ---

@@ -1,6 +1,6 @@
 # 🗺️ CryptoCapi — Estructura del Proyecto
 
-Monorepo de 3 servicios (Backend Node, Collector Python, Frontend Vite) con contratos compartidos. El núcleo del producto son **3 motores**: **Radar** (NLP/IA), **Quant Pro** (matemático/Binance) y **Quant Plus** (estadístico + on-chain, 100% determinista), más **Market Scan**, una capa de ranking sobre las señales de Quant Plus que se vende aparte.
+Monorepo de 3 servicios (Backend Node, Collector Python, Frontend Vite) con contratos compartidos. El núcleo del producto son **3 motores**: **Radar** (noticias verificadas + matemática; el único con IA), **Quant Pro** (matemático/Binance) y **Quant Plus** (estadístico + on-chain, 100% determinista), más **Market Scan**, una capa de ranking sobre las señales de Quant Plus que se vende aparte.
 
 ```
 cryptocapi-refactor/
@@ -42,9 +42,9 @@ cryptocapi-refactor/
 │
 ├── 📂 collector/                       # Python 3.12 — Radar + Quant Plus (Cloud Run Job)
 │   ├── services/
-│   │   ├── insight_service.py          # 📡 RADAR — NLP/LLM narrative (LLM engine multi-model)
+│   │   ├── insight_service.py          # 📡 RADAR — informe de Python + líneas del LLM por nota
 │   │   ├── quant_service.py            # 📈 QUANT PLUS — z-score over 51 Yahoo daily closes, 100% deterministic (no AI)
-│   │   ├── insights_common.py          # Shared Radar/Quant Plus code + post-LLM filters
+│   │   ├── insights_common.py          # Shared Radar/Quant Plus code: math report, sentiment, filters
 │   │   ├── math_engine.py              # MathContext: Z-Score (t-Student), Bollinger, regime
 │   │   ├── onchain_manager.py          # On-chain context, not part of the signal: Mempool.space (BTC) + Alchemy (ETH gas)
 │   │   ├── api_client.py               # CoinGecko API client

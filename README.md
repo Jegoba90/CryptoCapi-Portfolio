@@ -50,9 +50,9 @@ Plataforma de análisis de criptomonedas con tres motores especializados, dos pu
 
 > Los modelos de lenguaje **alucinan**. En finanzas, una alucinación cuesta dinero real.
 
-CryptoCapi resuelve esto con una arquitectura donde la **IA solo interpreta narrativa** (noticias, sentimiento)
-y **toda decisión numérica la calcula matemática verificable**: Z-Scores, filtros de Kalman y confluencia
-de indicadores técnicos, sobre cierres diarios de Yahoo Finance y velas de Binance.
+CryptoCapi resuelve esto con una arquitectura donde la **IA solo resume noticias**, cada línea verificada
+contra su nota, y **todo lo demás lo calcula y lo escribe matemática verificable**: Z-Scores, filtros de
+Kalman y confluencia de indicadores técnicos, sobre cierres diarios de Yahoo Finance y velas de Binance.
 
 <div align="center">
 
@@ -66,10 +66,10 @@ de indicadores técnicos, sobre cierres diarios de Yahoo Finance y velas de Bina
 
 | Motor | Rol | Tecnología clave |
 |:---|:---|:---|
-| 📡 **Motor Radar** | Ingesta cinco fuentes RSS verificadas (CoinDesk, The Block, Decrypt, CryptoSlate, Bitcoin Magazine) y genera sentimiento + resúmenes ejecutivos sin sensacionalismo. Cada fuente entra con su tier de credibilidad, y la matemática determinista valida o invalida la narrativa antes de publicarla. | `Python` · `LLM engine (multi-model)` · `feedparser` · `BeautifulSoup` |
+| 📡 **Motor Radar** | Lee cinco fuentes RSS (CoinDesk, The Block, Decrypt, CryptoSlate, Bitcoin Magazine): un modelo de lenguaje resume cada nota del activo en una línea, y Python la publica solo si cada cifra y cada nombre propio están en la nota; si no, sale el titular. El resto del informe y el sentimiento los escribe Python desde la matemática del último día cerrado. Cada fuente entra con su tier de credibilidad. | `Python` · `LLM engine (multi-model)` · `feedparser` · `BeautifulSoup` |
 | 📊 **Motor Quant PRO** | Señal cuantitativa on-demand sobre cualquier par de Binance: filtro de Kalman adaptativo para reducir ruido, cinco indicadores técnicos y Matriz de Intercepción de Régimen (MIR) dual-timeframe 1D/4H. | `NumPy` · `SciPy` · `Pandas` · `TA-Lib` · `Binance REST` |
-| 📈 **Motor Quant Plus** | Señales estadísticas pre-computadas sobre 51 cierres diarios: el retorno logarítmico del último día contra los 49 anteriores, con umbral t-Student (α=0.001 del modelo; con precios reales de cripto se cruza cerca de 1 de cada 75 días por moneda), e insight accionable con sello SHA-256 reproducible. En BTC y ETH suma contexto on-chain (congestión de red, actividad de ballenas), que se informa aparte y no mueve la señal. | `NumPy` · `SciPy` · `Pydantic` · `Mempool RPC` |
-| 🧭 **Market Scan** (capa, no motor) | Ranking del universo curado por fuerza de señal, armado sobre las señales de Quant Plus: no corre modelo propio, y se vende aparte, con su propio pase. Deja fuera a las stablecoins mientras aguantan la paridad: si una se despega, vuelve al ranking, porque un *depeg* es una señal. | `TypeScript` · `PostgreSQL` |
+| 📈 **Motor Quant Plus** | Señales estadísticas pre-computadas sobre 51 cierres diarios: el retorno logarítmico del último día contra los 49 anteriores, con umbral t-Student (α=0.001 del modelo; con precios reales de cripto se cruza cerca de 1 de cada 75 días por moneda), e insight accionable con sello SHA-256 reproducible. En BTC y ETH suma contexto on-chain (la congestión de la red y, en ETH, el gas cuando hay lectura), que se informa aparte y no mueve la señal. | `NumPy` · `SciPy` · `Pydantic` · `Mempool RPC` |
+| 🧭 **Market Scan** (capa, no motor) | Ranking del universo curado por cuánto se movió cada activo el último día cerrado, contra su propio umbral de anomalía, armado sobre las señales de Quant Plus: no corre modelo propio, y se vende aparte, con su propio pase. Deja fuera a las stablecoins mientras aguantan la paridad: si una se despega, vuelve al ranking, porque un *depeg* es una señal. | `TypeScript` · `PostgreSQL` |
 
 ### Cobertura por motor
 
@@ -86,18 +86,18 @@ de indicadores técnicos, sobre cierres diarios de Yahoo Finance y velas de Bina
 
 ## 🛡️ Pipeline Anti-Alucinación · Defensa en 4 Capas
 
-> El LLM redacta la narrativa. **Python certifica los números y vigila las palabras.** La IA nunca tiene la última palabra sobre una cifra.
+> **Python escribe el informe y certifica los números; la IA solo resume cada nota de prensa en una línea, y esa línea se verifica contra la nota.** Desde `v3.0.0-radar`, la IA no escribe ningún campo de la respuesta.
 
 | Capa | Qué hace |
 |:---|:---|
 | **1 · Determinista** | Python calcula *todos* los valores numéricos (Bandas de Bollinger, Z-Score logarítmico, régimen de mercado) **antes** de invocar al LLM. |
-| **2 · Narrativa** | Los valores deterministas se inyectan en el prompt como contexto *no negociable*; el LLM solo escribe texto sobre cifras ya fijadas. |
-| **3 · Override numérico** | Tras la respuesta del LLM, Python **sobrescribe** métricas, sentiment y confidence con los valores deterministas. |
-| **4 · Filtrado léxico** | Filtros deterministas eliminan frases alucinadas que sobrevivieron al prompt, usando *gates* basados en Z-Score y sentiment. |
+| **2 · Solo las notas** | El LLM recibe solo las notas de prensa del activo, sin precios ni matemática, y escribe una línea por nota con lo que la nota informa. |
+| **3 · Verificación contra la fuente** | Cada línea se publica solo si cada cifra y cada nombre propio están en la nota, y si no pronostica, no explica causas ni da el precio. Si no pasa, sale el titular de la nota tal cual. |
+| **4 · Python escribe** | El informe, el resumen, el sentimiento (el signo del Z-Score) y la confianza los escribe Python. |
 
 **Umbrales fijos y a la vista:** cambios de volatilidad extrema o rupturas de bandas estadísticas disparan alertas automáticas. Una anomalía se declara cuando el Z-Score cruza el valor crítico de la t de Student (3,5051 con 48 grados de libertad), y ese umbral viaja en cada respuesta PRO como `z_score_threshold`.
 
-La resiliencia de IA se apoya en **cadenas de fallback multi-modelo sobre buckets de cuota independientes** con *backoff* exponencial, de modo que ningún motor agote la capacidad de otro.
+La resiliencia de IA se apoya en **cadenas de fallback multi-modelo sobre buckets de cuota independientes** con *backoff* exponencial. Y si la cadena entera se agota, Radar publica igual: el informe es de Python, y las notas salen como sus titulares.
 
 ---
 
@@ -116,7 +116,7 @@ curl -H "x-api-key: demo_btc_eth_public" \
   "https://api.cryptocapi.com/v1/market/insights/bitcoin?view=alpha"
 ```
 
-**En tu terminal.** El agente open source [anti-hallucination-crypto-agent](https://github.com/Jegoba90/anti-hallucination-crypto-agent) consume esta API en vivo, muestra qué eliminó o sobrescribió el pipeline sobre la salida de la IA (`filters_applied`, `fields_overridden`) y te enseña a verificar el `protocol_hash` por tu cuenta. Viene con la demo key precargada: clonar y ejecutar.
+**En tu terminal.** El agente open source [anti-hallucination-crypto-agent](https://github.com/Jegoba90/anti-hallucination-crypto-agent) consume esta API en vivo, muestra qué declaró el pipeline en el sello (`filters_applied`, `fields_overridden`) y te enseña a verificar el `protocol_hash` por tu cuenta. Viene con la demo key precargada: clonar y ejecutar.
 
 **Trial PRO de 14 días, sin tarjeta,** para el resto de monedas y los motores Quant: [cryptocapi.com](https://www.cryptocapi.com)
 
@@ -214,7 +214,7 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
 
 ## 🔬 Outputs de ejemplo · Qué devuelve cada motor
 
-> Respuestas reales del sistema sobre **BTC**, desde producción. Radar, capturado el **2026-10-29** con la demo key pública y el motor `v2.4.0-radar`; Quant Plus, el **2026-10-30**, con `v2.5.0-math`; Quant PRO, el **2026-10-03**, con `v1.2.0-quant`. Quant Plus es además el caso de verificación de [SEAL.md](docs/SEAL.md): su vector trae un precio entero y una docena de empates exactos, así que ejercita la regla canónica de números en vez de suponerla. Cada sello dice su `engine_version`, y SEAL.md explica qué regla aplica a cada versión.
+> Respuestas reales del sistema sobre **BTC**, desde producción. Radar, capturado el **2026-10-29** con la demo key pública y el motor `v2.4.0-radar`, de antes del Radar híbrido de `v3.0.0-radar`, que está en producción desde el 2026-11-08 (queda por reemplazar con una captura de esa versión); Quant Plus, el **2026-10-30**, con `v2.5.0-math`; Quant PRO, el **2026-10-03**, con `v1.2.0-quant`. Quant Plus es además el caso de verificación de [SEAL.md](docs/SEAL.md): su vector trae un precio entero y una docena de empates exactos, así que ejercita la regla canónica de números en vez de suponerla. Cada sello dice su `engine_version`, y SEAL.md explica qué regla aplica a cada versión.
 
 <details>
 <summary>📡 Motor Radar · Sentimiento sobre fuentes verificadas · sello audit_trail</summary>
@@ -285,7 +285,7 @@ Conocé la distribución detallada de archivos y carpetas de cada módulo en el 
 }
 ```
 
-> El `audit_trail` declara qué corrigió Python sobre la salida del LLM: `fields_overridden` lista los campos sobrescritos con valores deterministas y `filters_applied`, los filtros léxicos que se dispararon. En esta captura saltó uno, `magnitude inflation`, y el pipeline llegó a reescribir el propio `detailed_report`. Cómo verificar el hash: [SEAL.md](docs/SEAL.md). La respuesta va entera, sin recortar, y está commiteada tal cual en [api/examples/radar-alpha.json](api/examples/radar-alpha.json).
+> En `v2.4.0-radar` el modelo escribía el informe, y el `audit_trail` declara qué corrigió Python: `fields_overridden` lista los campos sobrescritos con valores deterministas y `filters_applied`, los filtros léxicos que se dispararon. En esta captura saltó uno, `magnitude inflation`, y el pipeline llegó a reescribir el propio `detailed_report`. Desde `v3.0.0-radar` los mismos campos dicen qué comprobaciones descartaron una línea del modelo (`filters_applied`) y qué campos fijó Python (`fields_overridden`, con `analysis.detailed_report` cuando una nota salió como titular); el sello se verifica igual. Cómo verificar el hash: [SEAL.md](docs/SEAL.md). La respuesta va entera, sin recortar, y está commiteada tal cual en [api/examples/radar-alpha.json](api/examples/radar-alpha.json).
 
 </details>
 
@@ -480,7 +480,7 @@ Eso es todo. Sin key, el paquete cae en la key pública de demostración y `get_
 | `get_insight` | Radar o Quant Plus | Análisis de un activo. Con `engine="quant_plus"`, el sello reproducible y su vector de entrada |
 | `get_signal` | Quant Pro | Señal de ejecución para un par de trading |
 | `batch_signals` | Quant Plus | Señales de varios activos en una llamada |
-| `scan_market` | Market Scan | Ranking del universo curado por fuerza de señal |
+| `scan_market` | Market Scan | Ranking del universo curado por cuánto se movió cada activo contra su propio umbral |
 
 Cuatro herramientas, y **las cuatro devuelven inteligencia propia**: los tres motores y el ranking de Market Scan. El dato de terceros (precios, macro) se retiró de esta superficie a propósito: por MCP viaja solo lo que nuestros motores firman.
 
