@@ -219,7 +219,7 @@ Every error body has `status: "error"` and a `message`. Some also carry a `code`
 
 | HTTP Code | `code` | Meaning |
 |---|---|---|
-| `401` | none | Missing or invalid API key / Firebase token (except Radar's Pulse view with `view=pulse` in the URL, which needs none) |
+| `401` | none | Missing or malformed API key, or a missing, malformed or expired Firebase token (except Radar's Pulse view with `view=pulse` in the URL, which needs none). A well-formed key that does not exist is a `403` |
 | `403` | `PRODUCT_NOT_INCLUDED` | This key never included that engine (see Entitlement) |
 | `403` | `PRODUCT_NOT_ACTIVE` | This key holds that engine, but the pass lapsed |
 | `403` | `DEMO_COIN_RESTRICTED` | Demo key used on a coin other than `bitcoin`/`ethereum` |

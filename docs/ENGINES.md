@@ -84,8 +84,10 @@ CryptoCapi exposes three analytical engines and Market Scanner, a ranking layer 
 
 **Output includes:**
 - Ranked array of assets with signal, score, and regime
+- Each row carries `last_close_date` (the UTC day its numbers read), and the `protocol_hash` and `engine_version` of the Quant Plus reading it ranks, so the row can be checked against that sealed reading. `current_price` and `price_change_percentage_24h` are live; the rest of the row is the closed day
+- `data.universe_count`: how many assets passed the filters before `limit` (`count` is how many came back)
 - Filtered to assets with a Quant Plus signal fresher than 24 hours
-- Stablecoins are left out while they hold their peg. One that moves more than 1% in 24 hours comes back into the ranking, because a depeg is a signal
+- Stablecoins are left out while they hold their peg. One enters when the engine reads its peg as broken (`PEG_BROKEN`: last close 0.5 % or more from the dollar), ranked by that distance over 0.5 %, because a depeg is a signal
 
 **Query parameters:**
 | Param | Values | Default |
