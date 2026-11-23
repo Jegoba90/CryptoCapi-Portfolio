@@ -26,6 +26,7 @@ Plataforma de análisis de criptomonedas con tres motores especializados, dos pu
 ![Type Safe](https://img.shields.io/badge/type--safe-strict-blue?style=flat-square)
 ![CI](https://img.shields.io/badge/CI-quality--gate-blueviolet?style=flat-square)
 ![Tests](https://img.shields.io/badge/tests-Jest_·_Vitest_·_Pytest_·_Playwright-orange?style=flat-square)
+[![Mozilla Observatory](https://img.shields.io/mozilla-observatory/grade-score/www.cryptocapi.com?style=flat-square&label=Mozilla%20Observatory)](https://developer.mozilla.org/en-US/observatory/analyze?host=www.cryptocapi.com)
 
 </div>
 
